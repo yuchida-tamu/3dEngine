@@ -4,10 +4,15 @@ Shader::Shader(){
     shaderID = 0;
 }
 
-void Shader::CreateShaderFromFile(const char vertFilePath[],const char fragFilePath[]){
-    // read shader from the files and converted into char*
+void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath){
+   
+    std::string vertString = ReadFile(vertFilePath);
+    std::string fragString = ReadFile(fragFilePath);
 
-    // Compile(vertCode, fragCode)
+    const GLchar* vertCode = vertString.c_str();
+    const GLchar* fragCode = fragString.c_str();
+
+    CompileShader(vertCode, fragCode);
 }
 
 void Shader::CreateShaderFromString(const char* vertString, const char* fragString){
@@ -59,6 +64,28 @@ void Shader::AddShader(GLuint shaderProgram, const char* shaderCode, GLenum shad
     }
    
    glAttachShader(shaderProgram, shader);
+}
+
+std::string Shader::ReadFile(std::string filePath){
+    std::string line, allLines, source;
+    std::fstream vertFile(filePath);
+   
+    if (vertFile.is_open())
+    {
+        while (std::getline(vertFile, line))
+        {
+            source = source + line + "\n";
+        }
+        vertFile.close();
+    }
+    else
+    {
+        std::cout << "Unable to open file.";
+        std::string result("");
+        return result;
+    }
+
+    return source;
 }
 
 void Shader::UseShader(){
