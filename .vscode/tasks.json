@@ -12,6 +12,7 @@
         "-Wall",
         "-g",
         "-I${workspaceFolder}/dependencies/include",
+        "-I${workspaceFolder}/headers",
         "-L${workspaceFolder}/dependencies/library",
         "${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
         "${workspaceFolder}/*.cpp",
