@@ -18,7 +18,7 @@ std::vector<Shader> shaderList;
 
 void CreateShaders (){
     Shader* shader1 = new Shader();
-    shader1->CreateShaderFromFile("shaders/shader.vert", "shaders/shader.frag");
+    shader1->CreateShaderFromFile("src/shaders/shader.vert", "src/shaders/shader.frag");
     shaderList.push_back(*shader1);
 }
 
