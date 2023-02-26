@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/headers",
+                "${workspaceFolder}/dependencies/include",
                 "${workspaceFolder}/dependencies/include"
             ],
             "defines": [],
