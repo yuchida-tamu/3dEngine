@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include <glad/glad.h>
 
@@ -21,9 +22,11 @@ class Shader {
 
     private:
         GLuint shaderID;
+        std::vector<GLuint> shaderList;
 
         void CompileShader(const char* vertCode,const char* fragCode);
         void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
+        void DeleteShaderObj();
         std::string ReadFile(std::string filePath);
 
 };

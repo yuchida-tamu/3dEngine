@@ -64,6 +64,7 @@ void Shader::AddShader(GLuint shaderProgram, const char* shaderCode, GLenum shad
     }
    
    glAttachShader(shaderProgram, shader);
+   shaderList.push_back(shader);
 }
 
 std::string Shader::ReadFile(std::string filePath){
@@ -90,6 +91,15 @@ std::string Shader::ReadFile(std::string filePath){
 
 void Shader::UseShader(){
     glUseProgram(shaderID);
+
+    // delete shaders because they are not needed after being used by the shader program
+    DeleteShaderObj();
+}
+
+void Shader::DeleteShaderObj(){
+    for(GLuint shader : shaderList){
+        glDeleteShader(shader);
+    }
 }
 
 void Shader::ClearShader(){
