@@ -23,11 +23,11 @@ void CreateShaders()
 void CreateObjects()
 {
     float vertices[] = {
-        // first triangle
-        0.5f, 0.5f, 0.0f,   // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f   // top left
+        // positions        //colors
+        0.5f, 0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   0.0f, 1.0f,    // top left
     };
 
     unsigned int indices[] = {
@@ -36,7 +36,7 @@ void CreateObjects()
     };
 
     Mesh *obj1 = new Mesh();
-    obj1->CreateMesh(vertices, indices, 12, 6);
+    obj1->CreateMesh(vertices, indices, 36, 6, "src/resources/wall.jpg");
     meshList.push_back(obj1);
 }
 
@@ -63,7 +63,8 @@ int main()
     // render loop
     while (!mainWindow.getShouldClose())
     {
-        
+      
+
         // input
         mainWindow.ProcessInput();
 
