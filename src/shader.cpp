@@ -90,14 +90,10 @@ std::string Shader::ReadFile(std::string filePath){
 }
 
 void Shader::UseShader(){
-
-    float timeValue = glfwGetTime();
-    float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaderID, "ourColor");
-
     glUseProgram(shaderID);
-
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    // create func to set uniform location
+    glUniform1i(glGetUniformLocation(shaderID, "texture01"), 0);
+    glUniform1i(glGetUniformLocation(shaderID, "texture02"), 1);
 
     // delete shaders because they are not needed after being used by the shader program
     DeleteShaderObj();

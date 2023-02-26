@@ -8,7 +8,7 @@
 class Mesh
 {
 private:
-    unsigned int VAO, VBO, EBO, texture;
+    unsigned int VAO, VBO, EBO, texture, texture2;
     GLsizei indexCount;
 
 public:
