@@ -16,6 +16,8 @@ private:
     GLint width, height;
     GLint bufferWidth, bufferHeight;
 
+    float deltaTime, lastFrame;
+
 public:
     Window();
 
@@ -36,16 +38,20 @@ public:
         glm::vec3 cameraUp = mainCamera->getUp();
         float cameraSpeed = mainCamera->getSpeed();
 
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         if (glfwGetKey(mainWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(mainWindow, true);
         if (glfwGetKey(mainWindow, GLFW_KEY_W) == GLFW_PRESS)
-            mainCamera->updatePosition(cameraPos + cameraSpeed * cameraFront);
+            mainCamera->updatePosition(cameraPos + cameraSpeed * deltaTime * cameraFront);
         if (glfwGetKey(mainWindow, GLFW_KEY_S) == GLFW_PRESS)
-            mainCamera->updatePosition(cameraPos - cameraSpeed * cameraFront);
+            mainCamera->updatePosition(cameraPos - cameraSpeed * deltaTime * cameraFront);
         if (glfwGetKey(mainWindow, GLFW_KEY_A) == GLFW_PRESS)
-            mainCamera->updatePosition(cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
+            mainCamera->updatePosition(cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime);
         if (glfwGetKey(mainWindow, GLFW_KEY_D) == GLFW_PRESS)
-            mainCamera->updatePosition(cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
+            mainCamera->updatePosition(cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime);
     }
 
     ~Window();

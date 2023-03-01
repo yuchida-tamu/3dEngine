@@ -15,6 +15,8 @@ Window::Window()
 {
     width = SCR_WIDTH;
     height = SCR_HEIGHT;
+    deltaTime = 0.0f;
+    lastFrame = 0.0f;
 }
 
 int Window::Initialize()
