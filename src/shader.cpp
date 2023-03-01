@@ -2,6 +2,8 @@
 
 Shader::Shader(){
     shaderID = 0;
+    uniformProjection = 0;
+    uniformModel = 0; 
 }
 
 void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath){
@@ -39,6 +41,10 @@ void Shader::CompileShader(const char* vertCode,const char* fragCode){
         glGetProgramInfoLog(shaderID, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
+
+    uniformProjection = glGetUniformLocation(shaderID, "projection");
+    uniformView = glGetUniformLocation(shaderID, "view");
+    uniformModel = glGetUniformLocation(shaderID, "model");
 }
 
 void Shader::AddShader(GLuint shaderProgram, const char* shaderCode, GLenum shaderType){

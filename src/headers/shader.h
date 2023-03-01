@@ -10,25 +10,33 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-class Shader {
-    public:
-        Shader();
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-        void CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath);
-        void CreateShaderFromString(const char* vertString, const char* fragString);
+class Shader
+{
+public:
+    Shader();
 
-        void UseShader();
-        void ClearShader();
+    void CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath);
+    void CreateShaderFromString(const char *vertString, const char *fragString);
 
-        ~Shader();
+    GLuint GetUniformProjection() { return uniformProjection; };
+    GLuint GetUniformView() { return uniformView; };
+    GLuint GetUniformModel() { return uniformModel; };
 
-    private:
-        GLuint shaderID;
-        std::vector<GLuint> shaderList;
+    void UseShader();
+    void ClearShader();
 
-        void CompileShader(const char* vertCode,const char* fragCode);
-        void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
-        void DeleteShaderObj();
-        std::string ReadFile(std::string filePath);
+    ~Shader();
 
+private:
+    GLuint shaderID, uniformProjection, uniformView, uniformModel;
+    std::vector<GLuint> shaderList;
+
+    void CompileShader(const char *vertCode, const char *fragCode);
+    void AddShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
+    void DeleteShaderObj();
+    std::string ReadFile(std::string filePath);
 };

@@ -4,25 +4,29 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
 
-Window::Window(){
+Window::Window()
+{
     width = SCR_WIDTH;
     height = SCR_HEIGHT;
 }
 
-int Window::Initialize(){
-     // glfw: initialize and configure
+int Window::Initialize()
+{
+    // glfw: initialize and configure
     // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    mainCamera = new CameraObject();
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -48,7 +52,8 @@ int Window::Initialize(){
     return 0;
 }
 
-Window::~Window(){
+Window::~Window()
+{
     glfwDestroyWindow(mainWindow);
     glfwTerminate();
 }

@@ -1,29 +1,52 @@
+#pragma once
+
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-class Window {
-    private: 
-        GLFWwindow* mainWindow;
+#include "camera.h"
 
-        GLint width, height;
-        GLint bufferWidth, bufferHeight;
+class Window
+{
+private:
+    GLFWwindow *mainWindow;
 
-    public:
-        Window();
+    CameraObject *mainCamera;
 
-        int Initialize();
+    GLint width, height;
+    GLint bufferWidth, bufferHeight;
 
-        GLint getBufferWidth() { return bufferWidth; }
-        GLint getBufferHeight() { return bufferHeight; }
+public:
+    Window();
 
-        bool getShouldClose() { return glfwWindowShouldClose(mainWindow); }
+    int Initialize();
 
-        void SwapBuffers() { glfwSwapBuffers(mainWindow); }
-        void ProcessInput(){
-            if (glfwGetKey(mainWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    GLint getBufferWidth() { return bufferWidth; }
+    GLint getBufferHeight() { return bufferHeight; }
+
+    CameraObject *getCamera() { return mainCamera; };
+
+    bool getShouldClose() { return glfwWindowShouldClose(mainWindow); }
+
+    void SwapBuffers() { glfwSwapBuffers(mainWindow); }
+    void ProcessInput()
+    {
+        glm::vec3 cameraPos = mainCamera->getPosition();
+        glm::vec3 cameraFront = mainCamera->getFront();
+        glm::vec3 cameraUp = mainCamera->getUp();
+        float cameraSpeed = mainCamera->getSpeed();
+
+        if (glfwGetKey(mainWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(mainWindow, true);
-        }
+        if (glfwGetKey(mainWindow, GLFW_KEY_W) == GLFW_PRESS)
+            mainCamera->updatePosition(cameraPos + cameraSpeed * cameraFront);
+        if (glfwGetKey(mainWindow, GLFW_KEY_S) == GLFW_PRESS)
+            mainCamera->updatePosition(cameraPos - cameraSpeed * cameraFront);
+        if (glfwGetKey(mainWindow, GLFW_KEY_A) == GLFW_PRESS)
+            mainCamera->updatePosition(cameraPos - glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
+        if (glfwGetKey(mainWindow, GLFW_KEY_D) == GLFW_PRESS)
+            mainCamera->updatePosition(cameraPos + glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed);
+    }
 
-        ~Window();
+    ~Window();
 };
