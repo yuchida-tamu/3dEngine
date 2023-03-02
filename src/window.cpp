@@ -15,8 +15,6 @@ Window::Window()
 {
     width = SCR_WIDTH;
     height = SCR_HEIGHT;
-    deltaTime = 0.0f;
-    lastFrame = 0.0f;
 }
 
 int Window::Initialize()
@@ -28,7 +26,6 @@ int Window::Initialize()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    mainCamera = new CameraObject();
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -44,6 +41,8 @@ int Window::Initialize()
     }
     glfwMakeContextCurrent(mainWindow);
     glfwSetFramebufferSizeCallback(mainWindow, framebuffer_size_callback);
+
+    glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

@@ -17,6 +17,10 @@ CameraObject *mainCamera;
 
 std::vector<Shader> shaderList;
 std::vector<Mesh *> meshList;
+std::vector<glm::vec3> positions;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 glm::vec3 cubePositions[] = {
     glm::vec3(0.0f, 0.0f, 0.0f),
@@ -59,6 +63,7 @@ void CreateObjects()
     // };
 
     float vertices[] = {
+         // positions        // texture
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
         0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
@@ -119,12 +124,50 @@ void RenderMeshes()
     }
 }
 
+void RenderManyMeshes()
+{
+    for (unsigned int i = 0; i < 100; i++)
+    {
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, positions[i]);
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(20.0f * i / 10), glm::vec3(1.0f * i / 10, 0.5f * i / 10, 0.2f * i / 10));
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        int projectLocation = shaderList[0].GetUniformProjection();
+        int modelLocation = shaderList[0].GetUniformModel();
+        glUniformMatrix4fv(projectLocation, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+        meshList[0]->RenderMesh();
+    }
+}
+
+
+void processInput(GLFWwindow *window, CameraObject *camera)
+{
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->ProcessInput(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->ProcessInput(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->ProcessInput(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->ProcessInput(RIGHT, deltaTime);
+}
+
 int main()
 {
     mainWindow = Window();
     mainWindow.Initialize();
-    mainCamera = mainWindow.getCamera();
-
+    mainCamera = new CameraObject();
 
     CreateObjects();
     // build and compile our shader program
@@ -135,21 +178,18 @@ int main()
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    std::vector<glm::vec3> positions;
-
     for (unsigned int i = 0; i < 100; i++)
     {
         glm::vec3 pos = glm::vec3(glm::ballRand(5.0f).x, glm::ballRand(5.0f).y, glm::linearRand(0.0f, -40.0f));
-
         positions.push_back(pos);
     }
 
     // render loop
-    while (!mainWindow.getShouldClose())
+    while (!mainWindow.GetShouldClose())
     {
 
         // input
-        mainWindow.ProcessInput();
+        processInput(mainWindow.GetWindow(), mainCamera);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -157,30 +197,12 @@ int main()
 
         shaderList[0].UseShader();
 
-        glm::vec3 cameraPos = mainCamera->getPosition();
-        glm::vec3 cameraFront = mainCamera->getFront();
-        glm::vec3 cameraUp = mainCamera->getUp();
 
-        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        glm::mat4 view = mainCamera->GetViewMatrix();
         int viewLocation = shaderList[0].GetUniformView();
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
 
-        for (unsigned int i = 0; i < 100; i++)
-        {
-
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, positions[i]);
-            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(20.0f * i / 10), glm::vec3(1.0f * i / 10, 0.5f * i / 10, 0.2f * i / 10));
-            glm::mat4 projection;
-            projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-            int projectLocation = shaderList[0].GetUniformProjection();
-            int modelLocation = shaderList[0].GetUniformModel();
-            glUniformMatrix4fv(projectLocation, 1, GL_FALSE, glm::value_ptr(projection));
-            glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-            meshList[0]->RenderMesh();
-        }
+        RenderManyMeshes();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         mainWindow.SwapBuffers();

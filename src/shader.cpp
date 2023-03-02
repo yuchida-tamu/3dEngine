@@ -8,28 +8,42 @@ Shader::Shader(){
 
 void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath){
    
-    std::string vertString = ReadFile(vertFilePath);
-    std::string fragString = ReadFile(fragFilePath);
+    std::string vertString = readFile(vertFilePath);
+    std::string fragString = readFile(fragFilePath);
 
     const GLchar* vertCode = vertString.c_str();
     const GLchar* fragCode = fragString.c_str();
 
-    CompileShader(vertCode, fragCode);
+    compileShader(vertCode, fragCode);
 }
 
 void Shader::CreateShaderFromString(const char* vertString, const char* fragString){
     
     // Compile(vertCode, fragCode)
-    CompileShader(vertString, fragString);
+    compileShader(vertString, fragString);
+}
+void Shader::UseShader(){
+    glUseProgram(shaderID);
+    // create func to set uniform location
+    glUniform1i(glGetUniformLocation(shaderID, "texture01"), 0);
+    glUniform1i(glGetUniformLocation(shaderID, "texture02"), 1);
+
+    // delete shaders because they are not needed after being used by the shader program
+    deleteShaderObj();
 }
 
+void Shader::ClearShader(){
+    if(shaderID != 0){
+        glDeleteProgram(shaderID);
+        shaderID = 0;
+    }
+}
 
-
-void Shader::CompileShader(const char* vertCode,const char* fragCode){
+void Shader::compileShader(const char* vertCode,const char* fragCode){
     shaderID = glCreateProgram();
    
-    AddShader(shaderID, vertCode, GL_VERTEX_SHADER);
-    AddShader(shaderID, fragCode, GL_FRAGMENT_SHADER);
+    addShader(shaderID, vertCode, GL_VERTEX_SHADER);
+    addShader(shaderID, fragCode, GL_FRAGMENT_SHADER);
 
     glLinkProgram(shaderID);
 
@@ -47,7 +61,7 @@ void Shader::CompileShader(const char* vertCode,const char* fragCode){
     uniformModel = glGetUniformLocation(shaderID, "model");
 }
 
-void Shader::AddShader(GLuint shaderProgram, const char* shaderCode, GLenum shaderType){
+void Shader::addShader(GLuint shaderProgram, const char* shaderCode, GLenum shaderType){
     GLuint shader = glCreateShader(shaderType);
 
     const GLchar* shaderCodeBuffer[1];
@@ -73,7 +87,7 @@ void Shader::AddShader(GLuint shaderProgram, const char* shaderCode, GLenum shad
    shaderList.push_back(shader);
 }
 
-std::string Shader::ReadFile(std::string filePath){
+std::string Shader::readFile(std::string filePath){
     std::string line, allLines, source;
     std::fstream vertFile(filePath);
    
@@ -95,29 +109,11 @@ std::string Shader::ReadFile(std::string filePath){
     return source;
 }
 
-void Shader::UseShader(){
-    glUseProgram(shaderID);
-    // create func to set uniform location
-    glUniform1i(glGetUniformLocation(shaderID, "texture01"), 0);
-    glUniform1i(glGetUniformLocation(shaderID, "texture02"), 1);
-
-    // delete shaders because they are not needed after being used by the shader program
-    DeleteShaderObj();
-}
-
-void Shader::DeleteShaderObj(){
+void Shader::deleteShaderObj(){
     for(GLuint shader : shaderList){
         glDeleteShader(shader);
     }
 }
-
-void Shader::ClearShader(){
-    if(shaderID != 0){
-        glDeleteProgram(shaderID);
-        shaderID = 0;
-    }
-}
-
 
 Shader::~Shader(){
     ClearShader();

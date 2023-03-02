@@ -16,6 +16,14 @@
 
 class Shader
 {
+private:
+    GLuint shaderID, uniformProjection, uniformView, uniformModel;
+    std::vector<GLuint> shaderList;
+
+    void compileShader(const char *vertCode, const char *fragCode);
+    void addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
+    void deleteShaderObj();
+    std::string readFile(std::string filePath);
 public:
     Shader();
 
@@ -31,12 +39,4 @@ public:
 
     ~Shader();
 
-private:
-    GLuint shaderID, uniformProjection, uniformView, uniformModel;
-    std::vector<GLuint> shaderList;
-
-    void CompileShader(const char *vertCode, const char *fragCode);
-    void AddShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
-    void DeleteShaderObj();
-    std::string ReadFile(std::string filePath);
 };

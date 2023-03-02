@@ -1,24 +1,43 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h>
+
+enum CAMERA_MOVEMENT
+{
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+};
+
+// Default camera values
+const float YAW = -90.0f;
+const float PITCH = 0.0f;
+const float SPEED = 2.5f;
+const float SENSITIVITY = 0.1f;
+const float ZOOM = 45.0f;
 
 class CameraObject
 {
 private:
-    glm::vec3 position;
-    glm::vec3 front;
-    glm::vec3 up;
+    glm::vec3 position, front, up, right, worldUp;
+    float speed, yaw, pitch, mouseSensitivity, zoom;
 
-    float speed;
+    void updateCameraVectors();
 
 public:
-    CameraObject();
+    CameraObject(
+        glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f),
+        float _yaw = YAW,
+        float _pitch = PITCH);
 
-    glm::vec3 getPosition() { return position; };
-    glm::vec3 getFront() { return front; };
-    glm::vec3 getUp() { return up; };
-    float getSpeed() { return speed; };
-    void updatePosition(glm::vec3 pos) { position = pos; };
-
+    glm::mat4 GetViewMatrix();
+    void ProcessInput(CAMERA_MOVEMENT direction, float deltaTime);
+    void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
+    void ProcessMouseScroll(float yoffset);
+    
     ~CameraObject();
 };
