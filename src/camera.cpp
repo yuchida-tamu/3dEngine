@@ -10,6 +10,7 @@ CameraObject::CameraObject(glm::vec3 _position,
     yaw = _yaw;
     pitch = _pitch;
     speed = SPEED;
+    mouseSensitivity = SENSITIVITY;
 
     updateCameraVectors();
 }

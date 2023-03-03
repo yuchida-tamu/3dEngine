@@ -41,6 +41,7 @@ int Window::Initialize()
     }
     glfwMakeContextCurrent(mainWindow);
     glfwSetFramebufferSizeCallback(mainWindow, framebuffer_size_callback);
+    
 
     glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

@@ -22,6 +22,12 @@ std::vector<glm::vec3> positions;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+bool firstMouse = true;
+double lastX = 0.0;
+double lastY = 0.0;
+float xoffset = 0.0f;
+float yoffset = 0.0f;
+
 glm::vec3 cubePositions[] = {
     glm::vec3(0.0f, 0.0f, 0.0f),
     glm::vec3(2.0f, 5.0f, -15.0f),
@@ -63,7 +69,7 @@ void CreateObjects()
     // };
 
     float vertices[] = {
-         // positions        // texture
+        // positions        // texture
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
         0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
@@ -144,7 +150,6 @@ void RenderManyMeshes()
     }
 }
 
-
 void processInput(GLFWwindow *window, CameraObject *camera)
 {
     float currentFrame = glfwGetTime();
@@ -163,11 +168,31 @@ void processInput(GLFWwindow *window, CameraObject *camera)
         camera->ProcessInput(RIGHT, deltaTime);
 }
 
+void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    xoffset = xpos - lastX;
+    yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+    
+    mainCamera->ProcessMouseMovement(xoffset, yoffset);
+}
+
 int main()
 {
     mainWindow = Window();
     mainWindow.Initialize();
     mainCamera = new CameraObject();
+    glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
 
     CreateObjects();
     // build and compile our shader program
@@ -189,6 +214,7 @@ int main()
     {
 
         // input
+       
         processInput(mainWindow.GetWindow(), mainCamera);
 
         // render
@@ -196,7 +222,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaderList[0].UseShader();
-
 
         glm::mat4 view = mainCamera->GetViewMatrix();
         int viewLocation = shaderList[0].GetUniformView();
@@ -208,6 +233,7 @@ int main()
         mainWindow.SwapBuffers();
 
         glfwPollEvents();
+
     }
 
     glUseProgram(0);
