@@ -261,7 +261,7 @@ void create_objects()
     };
 
     Mesh *obj1 = new Mesh();
-    obj1->CreateMesh(vertices, indices, 180, 6, "src/resources/wall.jpg");
+    obj1->CreateMeshWithTexture(vertices, indices, 180, 6, "src/resources/wall.jpg");
     meshList.push_back(obj1);
 }
 
