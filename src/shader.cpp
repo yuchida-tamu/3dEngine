@@ -27,7 +27,6 @@ void Shader::UseShader(){
     glUseProgram(shaderID);
     // create func to set uniform location
     glUniform1i(glGetUniformLocation(shaderID, "texture01"), 0);
-    glUniform1i(glGetUniformLocation(shaderID, "texture02"), 1);
 
 }
 
