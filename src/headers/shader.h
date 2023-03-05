@@ -18,17 +18,17 @@ class Shader
 {
 private:
     GLuint shaderID, uniformProjection, uniformView, uniformModel;
-    std::vector<GLuint> shaderList;
 
     void compileShader(const char *vertCode, const char *fragCode);
-    void addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
-    void deleteShaderObj();
+    unsigned int addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
     std::string readFile(std::string filePath);
 public:
     Shader();
 
     void CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath);
     void CreateShaderFromString(const char *vertString, const char *fragString);
+    void SetUniformVec3(const char* name, glm::vec3 vec);
+    void SetUniformMat4(const char* name, glm::mat4 vec);
 
     GLuint GetUniformProjection() { return uniformProjection; };
     GLuint GetUniformView() { return uniformView; };

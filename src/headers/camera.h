@@ -13,8 +13,9 @@ enum CAMERA_MOVEMENT
 };
 
 // Default camera values
+const glm::vec3 POSITION = glm::vec3(0.0f, 2.0f, 0.0f);
 const float YAW = -90.0f;
-const float PITCH = 0.0f;
+const float PITCH = -25.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
@@ -29,7 +30,7 @@ private:
 
 public:
     CameraObject(
-        glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3 _position = POSITION,
         glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f),
         float _yaw = YAW,
         float _pitch = PITCH);

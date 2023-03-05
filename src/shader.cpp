@@ -17,9 +17,7 @@ void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFile
     compileShader(vertCode, fragCode);
 }
 
-void Shader::CreateShaderFromString(const char* vertString, const char* fragString){
-    
-    // Compile(vertCode, fragCode)
+void Shader::CreateShaderFromString(const char* vertString, const char* fragString){    
     compileShader(vertString, fragString);
 }
 void Shader::UseShader(){
@@ -28,8 +26,16 @@ void Shader::UseShader(){
     glUniform1i(glGetUniformLocation(shaderID, "texture01"), 0);
     glUniform1i(glGetUniformLocation(shaderID, "texture02"), 1);
 
-    // delete shaders because they are not needed after being used by the shader program
-    deleteShaderObj();
+}
+
+void Shader::SetUniformVec3(const char* name, glm::vec3 vec){
+   GLuint uniformLoc=  glGetUniformLocation(shaderID, name);
+   glUniform3fv(uniformLoc, 1, glm::value_ptr(vec));
+}
+
+void Shader::SetUniformMat4(const char* name, glm::mat4 mat){
+   GLuint uniformLoc=  glGetUniformLocation(shaderID, name);
+   glUniformMatrix4fv(uniformLoc, 1,GL_FALSE, glm::value_ptr(mat));
 }
 
 void Shader::ClearShader(){
@@ -42,10 +48,13 @@ void Shader::ClearShader(){
 void Shader::compileShader(const char* vertCode,const char* fragCode){
     shaderID = glCreateProgram();
    
-    addShader(shaderID, vertCode, GL_VERTEX_SHADER);
-    addShader(shaderID, fragCode, GL_FRAGMENT_SHADER);
+    unsigned int vertex = addShader(shaderID, vertCode, GL_VERTEX_SHADER);
+    unsigned int frag = addShader(shaderID, fragCode, GL_FRAGMENT_SHADER);
 
     glLinkProgram(shaderID);
+
+    glDeleteShader(vertex);
+    glDeleteShader(frag);
 
     // check for linking errors
     int success;
@@ -61,7 +70,7 @@ void Shader::compileShader(const char* vertCode,const char* fragCode){
     uniformModel = glGetUniformLocation(shaderID, "model");
 }
 
-void Shader::addShader(GLuint shaderProgram, const char* shaderCode, GLenum shaderType){
+unsigned int Shader::addShader(GLuint shaderProgram, const char* shaderCode, GLenum shaderType){
     GLuint shader = glCreateShader(shaderType);
 
     const GLchar* shaderCodeBuffer[1];
@@ -84,7 +93,8 @@ void Shader::addShader(GLuint shaderProgram, const char* shaderCode, GLenum shad
     }
    
    glAttachShader(shaderProgram, shader);
-   shaderList.push_back(shader);
+
+   return shader;
 }
 
 std::string Shader::readFile(std::string filePath){
@@ -107,12 +117,6 @@ std::string Shader::readFile(std::string filePath){
     }
 
     return source;
-}
-
-void Shader::deleteShaderObj(){
-    for(GLuint shader : shaderList){
-        glDeleteShader(shader);
-    }
 }
 
 Shader::~Shader(){
