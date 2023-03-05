@@ -30,6 +30,7 @@ public:
     void CreateShaderFromString(const char *vertString, const char *fragString);
     void SetUniformVec3(const char* name, glm::vec3 vec);
     void SetUniformMat4(const char* name, glm::mat4 vec);
+    void SetUniformTextureIndex(const char* name, uint );
 
     GLuint GetUniformProjection() { return uniformProjection; };
     GLuint GetUniformView() { return uniformView; };

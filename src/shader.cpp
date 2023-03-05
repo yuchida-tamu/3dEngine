@@ -1,55 +1,68 @@
 #include "shader.h"
 
-Shader::Shader(){
+Shader::Shader()
+{
     shaderID = 0;
     uniformProjection = 0;
-    uniformModel = 0; 
+    uniformModel = 0;
 }
-Shader::Shader(std::string vertFilePath, std::string fragFilePath){
+Shader::Shader(std::string vertFilePath, std::string fragFilePath)
+{
     CreateShaderFromFile(vertFilePath, fragFilePath);
 }
 
-void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath){
-   
+void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath)
+{
+
     std::string vertString = readFile(vertFilePath);
     std::string fragString = readFile(fragFilePath);
 
-    const GLchar* vertCode = vertString.c_str();
-    const GLchar* fragCode = fragString.c_str();
+    const GLchar *vertCode = vertString.c_str();
+    const GLchar *fragCode = fragString.c_str();
 
     compileShader(vertCode, fragCode);
 }
 
-void Shader::CreateShaderFromString(const char* vertString, const char* fragString){    
+void Shader::CreateShaderFromString(const char *vertString, const char *fragString)
+{
     compileShader(vertString, fragString);
 }
-void Shader::UseShader(){
+void Shader::UseShader()
+{
     glUseProgram(shaderID);
-    // create func to set uniform location
-    glUniform1i(glGetUniformLocation(shaderID, "texture01"), 0);
-
 }
 
-void Shader::SetUniformVec3(const char* name, glm::vec3 vec){
-   GLuint uniformLoc=  glGetUniformLocation(shaderID, name);
-   glUniform3fv(uniformLoc, 1, glm::value_ptr(vec));
+void Shader::SetUniformVec3(const char *name, glm::vec3 vec)
+{
+    GLuint uniformLoc = glGetUniformLocation(shaderID, name);
+    glUniform3fv(uniformLoc, 1, glm::value_ptr(vec));
 }
 
-void Shader::SetUniformMat4(const char* name, glm::mat4 mat){
-   GLuint uniformLoc=  glGetUniformLocation(shaderID, name);
-   glUniformMatrix4fv(uniformLoc, 1,GL_FALSE, glm::value_ptr(mat));
+void Shader::SetUniformMat4(const char *name, glm::mat4 mat)
+{
+    GLuint uniformLoc = glGetUniformLocation(shaderID, name);
+    glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::ClearShader(){
-    if(shaderID != 0){
+void Shader::SetUniformTextureIndex(const char *name, GLuint index)
+{
+    GLuint uniformLoc = glGetUniformLocation(shaderID, name);
+    glUniform1i(uniformLoc, index);
+}
+
+void Shader::ClearShader()
+{
+    if (shaderID != 0)
+    {
         glDeleteProgram(shaderID);
         shaderID = 0;
     }
 }
 
-void Shader::compileShader(const char* vertCode,const char* fragCode){
+void Shader::compileShader(const char *vertCode, const char *fragCode)
+{
     shaderID = glCreateProgram();
-   
+
     unsigned int vertex = addShader(shaderID, vertCode, GL_VERTEX_SHADER);
     unsigned int frag = addShader(shaderID, fragCode, GL_FRAGMENT_SHADER);
 
@@ -62,9 +75,11 @@ void Shader::compileShader(const char* vertCode,const char* fragCode){
     int success;
     char infoLog[512];
     glGetProgramiv(shaderID, GL_LINK_STATUS, &success);
-    if (!success) {
+    if (!success)
+    {
         glGetProgramInfoLog(shaderID, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+                  << infoLog << std::endl;
     }
 
     uniformProjection = glGetUniformLocation(shaderID, "projection");
@@ -72,14 +87,15 @@ void Shader::compileShader(const char* vertCode,const char* fragCode){
     uniformModel = glGetUniformLocation(shaderID, "model");
 }
 
-unsigned int Shader::addShader(GLuint shaderProgram, const char* shaderCode, GLenum shaderType){
+unsigned int Shader::addShader(GLuint shaderProgram, const char *shaderCode, GLenum shaderType)
+{
     GLuint shader = glCreateShader(shaderType);
 
-    const GLchar* shaderCodeBuffer[1];
+    const GLchar *shaderCodeBuffer[1];
     shaderCodeBuffer[0] = shaderCode;
 
-     GLint codeLength[1];
-     codeLength[0] = strlen(shaderCode);
+    GLint codeLength[1];
+    codeLength[0] = strlen(shaderCode);
 
     glShaderSource(shader, 1, shaderCodeBuffer, codeLength);
     glCompileShader(shader);
@@ -91,18 +107,20 @@ unsigned int Shader::addShader(GLuint shaderProgram, const char* shaderCode, GLe
     if (!success)
     {
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
+                  << infoLog << std::endl;
     }
-   
-   glAttachShader(shaderProgram, shader);
 
-   return shader;
+    glAttachShader(shaderProgram, shader);
+
+    return shader;
 }
 
-std::string Shader::readFile(std::string filePath){
+std::string Shader::readFile(std::string filePath)
+{
     std::string line, allLines, source;
     std::fstream vertFile(filePath);
-   
+
     if (vertFile.is_open())
     {
         while (std::getline(vertFile, line))
@@ -121,6 +139,7 @@ std::string Shader::readFile(std::string filePath){
     return source;
 }
 
-Shader::~Shader(){
+Shader::~Shader()
+{
     ClearShader();
 }
