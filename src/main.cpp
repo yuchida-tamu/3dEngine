@@ -145,8 +145,7 @@ float lightCubeVertices[] = {
 
 void CreateShaders()
 {
-    Shader *shader1 = new Shader();
-    shader1->CreateShaderFromFile("src/shaders/shader.vert", "src/shaders/shader.frag");
+    Shader *shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");
     shaderList.push_back(*shader1);
 }
 
@@ -294,8 +293,7 @@ int main()
     // build and compile our shader program
     CreateShaders();
 
-    Shader lightingShader = Shader();
-    lightingShader.CreateShaderFromFile("src/shaders/lighting.vs", "src/shaders/lighting.fs");
+    Shader lightingShader = Shader("src/shaders/lighting.vs", "src/shaders/lighting.fs");
 
     glEnable(GL_DEPTH_TEST);
 

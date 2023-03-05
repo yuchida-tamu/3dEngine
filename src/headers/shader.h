@@ -24,6 +24,7 @@ private:
     std::string readFile(std::string filePath);
 public:
     Shader();
+    Shader(std::string vertFilePath, std::string fragFilePath);
 
     void CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath);
     void CreateShaderFromString(const char *vertString, const char *fragString);

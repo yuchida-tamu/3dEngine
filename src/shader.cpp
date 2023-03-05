@@ -5,6 +5,9 @@ Shader::Shader(){
     uniformProjection = 0;
     uniformModel = 0; 
 }
+Shader::Shader(std::string vertFilePath, std::string fragFilePath){
+    CreateShaderFromFile(vertFilePath, fragFilePath);
+}
 
 void Shader::CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath){
    
