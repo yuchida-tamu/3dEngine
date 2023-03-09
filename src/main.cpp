@@ -13,6 +13,9 @@
 #include "camera.h"
 #include "mesh_data.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 Window mainWindow;
 CameraObject *mainCamera;
 
@@ -29,13 +32,14 @@ float xoffset = 0.0f;
 float yoffset = 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 3.0f, 2.0f);
+glm::vec3 lightPos(-2.0f, 3.0f, 0.5f);
 
 void create_shaders();
 void create_objects();
 void render_meshes(Shader *shader);
 void processInput(GLFWwindow *window, CameraObject *camera);
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
+unsigned int loadTexture(const char *path);
 
 int main()
 {
@@ -85,7 +89,7 @@ int main()
 
         // render lighting object
         lightingShader.UseShader();
-        lightingShader.SetUniformVec3("objectColor", glm::vec3(1.0f, 0.0f, 1.0f));
+        lightingShader.SetUniformVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
         glm::mat4 lightView = mainCamera->GetViewMatrix();
         int lightViewLocation = lightingShader.GetUniformView();
@@ -167,7 +171,7 @@ void create_objects()
     };
 
     Mesh *obj1 = new Mesh();
-    obj1->CreateMeshWithTexture(basic_cube_vertices, indices, 288, 6, "src/resources/wall.jpg");
+    obj1->CreateMesh(basic_cube_vertices, indices, 288, 6);
     meshList.push_back(obj1);
 }
 
@@ -178,23 +182,27 @@ void render_meshes(Shader *shader)
     model = glm::mat4(1.0f) = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
+    shader->UseShader();
+
+    // load textures (we now use a utility function to keep the code more organized)
+    // -----------------------------------------------------------------------------
+    unsigned int diffuseMap = loadTexture("src/resources/box_diffuse.png");
+    unsigned int specularMap = loadTexture("src/resources/box_specular.png");
+
     for (Mesh *mesh : meshList)
     {
-        shader->UseShader();
-        shader->SetUniformTextureIndex("texture01", 0);
         glm::mat4 view = mainCamera->GetViewMatrix();
 
         shader->SetUniformMat4("view", view);
         shader->SetUniformMat4("model", model);
         shader->SetUniformMat4("projection", projection);
 
-        shader->SetUniformVec3("lightColor", glm::vec3(0.0f, 1.0f, 1.0f));
+        shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
         shader->SetUniformVec3("lightPos", lightPos);
 
-        shader->SetUniformVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-        shader->SetUniformVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-        shader->SetUniformVec3("material.specular", glm::vec3(1.0f, 0.5f, 0.31f));
-        shader->SetUnifromFloat("material.shininess", 100.0f);
+        shader->SetUniformInt("material.diffuse", 0);
+        shader->SetUniformInt("material.specular", 1);
+        shader->SetUniformFloat("material.shininess", 100.0f);
 
         shader->SetUniformVec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
         shader->SetUniformVec3("light.diffuse", glm::vec3(0.2f, 0.0f, 0.2f)); // darken diffuse light a bit
@@ -202,6 +210,52 @@ void render_meshes(Shader *shader)
 
         shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
 
+        // bind diffuse map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        // bind specular map
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
+
         mesh->RenderMesh();
     }
+}
+
+// utility function for loading a 2D texture from file
+// ---------------------------------------------------
+unsigned int loadTexture(char const *path)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format = GL_RGB;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }

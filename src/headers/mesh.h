@@ -22,12 +22,6 @@ public:
         unsigned int *indices,
         unsigned int verticesCount,
         unsigned int indicesCount);
-    void CreateMeshWithTexture(
-        GLfloat *vertices,
-        unsigned int *indices,
-        unsigned int verticesCount,
-        unsigned int indicesCount,
-        const char *texturePath);
     void AddTexture(const char *texturePath);
     void RenderMesh();
     void ClearMesh();

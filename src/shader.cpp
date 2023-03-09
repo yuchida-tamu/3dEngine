@@ -32,7 +32,12 @@ void Shader::UseShader()
     glUseProgram(shaderID);
 }
 
-void Shader::SetUnifromFloat(const char* name, float value){
+void Shader::SetUniformInt(const char* name, int value){
+    GLuint uniformLoc = glGetUniformLocation(shaderID, name);
+    glUniform1i(uniformLoc, value);
+}
+
+void Shader::SetUniformFloat(const char* name, float value){
     GLuint uniformLoc = glGetUniformLocation(shaderID, name);
     glUniform1f(uniformLoc, value);
 }
