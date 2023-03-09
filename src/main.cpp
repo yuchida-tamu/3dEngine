@@ -202,11 +202,11 @@ void render_meshes(Shader *shader)
 
         shader->SetUniformInt("material.diffuse", 0);
         shader->SetUniformInt("material.specular", 1);
-        shader->SetUniformFloat("material.shininess", 100.0f);
+        shader->SetUniformFloat("material.shininess", 32.0f);
 
         shader->SetUniformVec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
-        shader->SetUniformVec3("light.diffuse", glm::vec3(0.2f, 0.0f, 0.2f)); // darken diffuse light a bit
-        shader->SetUniformVec3("light.specular", glm::vec3(0.2f, 0.0f, 0.2f));
+        shader->SetUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+        shader->SetUniformVec3("light.specular", glm::vec3(1.0, 1.0f, 1.0f));
 
         shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
 
