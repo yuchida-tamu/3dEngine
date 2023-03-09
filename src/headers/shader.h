@@ -28,6 +28,7 @@ public:
 
     void CreateShaderFromFile(std::string vertFilePath, std::string fragFilePath);
     void CreateShaderFromString(const char *vertString, const char *fragString);
+    void SetUnifromFloat(const char* name, float value);
     void SetUniformVec3(const char* name, glm::vec3 vec);
     void SetUniformMat4(const char* name, glm::mat4 vec);
     void SetUniformTextureIndex(const char* name, uint );

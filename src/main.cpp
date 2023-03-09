@@ -11,6 +11,7 @@
 #include "mesh.h"
 #include "window.h"
 #include "camera.h"
+#include "mesh_data.h"
 
 Window mainWindow;
 CameraObject *mainCamera;
@@ -27,55 +28,12 @@ double lastY = 0.0;
 float xoffset = 0.0f;
 float yoffset = 0.0f;
 
-float lightCubeVertices[] =
-{
-    // position
-    -0.5f, -0.5f, -0.5f, 
-    0.5f, -0.5f, -0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    -0.5f,  0.5f, -0.5f, 
-    -0.5f, -0.5f, -0.5f, 
-    // position
-    -0.5f, -0.5f,  0.5f, 
-    0.5f, -0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    -0.5f,  0.5f,  0.5f, 
-    -0.5f, -0.5f,  0.5f, 
-     // position
-    -0.5f,  0.5f,  0.5f, 
-    -0.5f,  0.5f, -0.5f, 
-    -0.5f, -0.5f, -0.5f, 
-    -0.5f, -0.5f, -0.5f, 
-    -0.5f, -0.5f,  0.5f, 
-    -0.5f,  0.5f,  0.5f, 
-    // position
-    0.5f,  0.5f,  0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    // position
-    -0.5f, -0.5f, -0.5f, 
-    0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    -0.5f, -0.5f,  0.5f, 
-    -0.5f, -0.5f, -0.5f, 
-    // position
-    -0.5f,  0.5f, -0.5f, 
-    0.5f,  0.5f, -0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    -0.5f,  0.5f,  0.5f, 
-    -0.5f,  0.5f, -0.5f, 
-};
+// lighting
+glm::vec3 lightPos(1.2f, 3.0f, 2.0f);
 
 void create_shaders();
 void create_objects();
-void render_meshes();
+void render_meshes(Shader *shader);
 void processInput(GLFWwindow *window, CameraObject *camera);
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
 
@@ -94,10 +52,10 @@ int main()
     glGenBuffers(1, &lightVBO);
 
     glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(lightCubeVertices), lightCubeVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(light_cube_vertices), light_cube_vertices, GL_STATIC_DRAW);
 
     glBindVertexArray(lightVAO);
-     // position attribute
+    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
@@ -119,28 +77,21 @@ int main()
         processInput(mainWindow.GetWindow(), mainCamera);
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shaderList[0].UseShader();
-        shaderList[0].SetUniformTextureIndex("texture01", 0);
-
-        glm::mat4 view = mainCamera->GetViewMatrix();
-        int viewLocation = shaderList[0].GetUniformView();
-        glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-
-        render_meshes();
+        // render Box
+        render_meshes(&shaderList[0]);
 
         // render lighting object
         lightingShader.UseShader();
-        lightingShader.SetUniformVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-        lightingShader.SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        lightingShader.SetUniformVec3("objectColor", glm::vec3(1.0f, 0.0f, 1.0f));
 
         glm::mat4 lightView = mainCamera->GetViewMatrix();
         int lightViewLocation = lightingShader.GetUniformView();
         glUniformMatrix4fv(lightViewLocation, 1, GL_FALSE, glm::value_ptr(lightView));
         glm::mat4 lightModel = glm::mat4(1.0f);
-        lightModel = glm::translate(lightModel, glm::vec3(1.5f, 0.0f, -5.0f));
+        lightModel = glm::translate(lightModel, lightPos);
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
@@ -208,76 +159,48 @@ void create_shaders()
     shaderList.push_back(*shader1);
 }
 
-
 void create_objects()
 {
-    float vertices[] = {
-        // positions        // texture
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
-
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
 
     Mesh *obj1 = new Mesh();
-    obj1->CreateMeshWithTexture(vertices, indices, 180, 6, "src/resources/wall.jpg");
+    obj1->CreateMeshWithTexture(basic_cube_vertices, indices, 288, 6, "src/resources/wall.jpg");
     meshList.push_back(obj1);
 }
 
-void render_meshes()
+void render_meshes(Shader *shader)
 {
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::mat4(1.0f) = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
     for (Mesh *mesh : meshList)
     {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        shader->UseShader();
+        shader->SetUniformTextureIndex("texture01", 0);
+        glm::mat4 view = mainCamera->GetViewMatrix();
 
-        int projectLocation = shaderList[0].GetUniformProjection();
-        int modelLocation = shaderList[0].GetUniformModel();
-        glUniformMatrix4fv(projectLocation, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+        shader->SetUniformMat4("view", view);
+        shader->SetUniformMat4("model", model);
+        shader->SetUniformMat4("projection", projection);
+
+        shader->SetUniformVec3("lightColor", glm::vec3(0.0f, 1.0f, 1.0f));
+        shader->SetUniformVec3("lightPos", lightPos);
+
+        shader->SetUniformVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+        shader->SetUniformVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        shader->SetUniformVec3("material.specular", glm::vec3(1.0f, 0.5f, 0.31f));
+        shader->SetUnifromFloat("material.shininess", 100.0f);
+
+        shader->SetUniformVec3("light.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+        shader->SetUniformVec3("light.diffuse", glm::vec3(0.2f, 0.0f, 0.2f)); // darken diffuse light a bit
+        shader->SetUniformVec3("light.specular", glm::vec3(0.2f, 0.0f, 0.2f));
+
+        shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
 
         mesh->RenderMesh();
     }

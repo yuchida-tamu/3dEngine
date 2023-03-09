@@ -36,9 +36,10 @@ public:
         float _pitch = PITCH);
 
     glm::mat4 GetViewMatrix();
+    glm::vec3 GetPosition() { return position; };
     void ProcessInput(CAMERA_MOVEMENT direction, float deltaTime);
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void ProcessMouseScroll(float yoffset);
-    
+
     ~CameraObject();
 };
