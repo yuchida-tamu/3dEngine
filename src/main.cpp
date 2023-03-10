@@ -189,36 +189,33 @@ void render_meshes(Shader *shader)
     unsigned int diffuseMap = loadTexture("src/resources/box_diffuse.png");
     unsigned int specularMap = loadTexture("src/resources/box_specular.png");
 
-    for (Mesh *mesh : meshList)
-    {
-        glm::mat4 view = mainCamera->GetViewMatrix();
+    glm::mat4 view = mainCamera->GetViewMatrix();
 
-        shader->SetUniformMat4("view", view);
-        shader->SetUniformMat4("model", model);
-        shader->SetUniformMat4("projection", projection);
+    shader->SetUniformMat4("view", view);
+    shader->SetUniformMat4("model", model);
+    shader->SetUniformMat4("projection", projection);
 
-        shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
-        shader->SetUniformInt("material.diffuse", 0);
-        shader->SetUniformInt("material.specular", 1);
-        shader->SetUniformFloat("material.shininess", 64.0f);
+    shader->SetUniformInt("material.diffuse", 0);
+    shader->SetUniformInt("material.specular", 1);
+    shader->SetUniformFloat("material.shininess", 64.0f);
 
-        shader->SetUniformVec3("light.direction", glm::vec3( -0.2f, -1.0f, -0.3f));
-        shader->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        shader->SetUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
-        shader->SetUniformVec3("light.specular", glm::vec3(1.0, 1.0f, 1.0f));
+    shader->SetUniformVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+    shader->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+    shader->SetUniformVec3("light.specular", glm::vec3(1.0, 1.0f, 1.0f));
 
-        shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
+    shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
 
-        // bind diffuse map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, diffuseMap);
-        // bind specular map
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, specularMap);
+    // bind diffuse map
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
+    // bind specular map
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, specularMap);
 
-        mesh->RenderMesh();
-    }
+    meshList[0]->RenderMesh();
 }
 
 // utility function for loading a 2D texture from file
