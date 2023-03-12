@@ -13,9 +13,6 @@
 #include "camera.h"
 #include "mesh_data.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 Window mainWindow;
 CameraObject *mainCamera;
 
@@ -39,7 +36,6 @@ void create_objects();
 void render_meshes(Shader *shader);
 void processInput(GLFWwindow *window, CameraObject *camera);
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
-unsigned int loadTexture(const char *path);
 
 int main()
 {
@@ -50,23 +46,8 @@ int main()
 
     create_objects();
 
-    // Light Object
-    unsigned int lightVAO, lightVBO;
-    glGenVertexArrays(1, &lightVAO);
-    glGenBuffers(1, &lightVBO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(light_cube_vertices), light_cube_vertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(lightVAO);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-
     // build and compile our shader program
     create_shaders();
-
-    Shader lightingShader = Shader("src/shaders/lighting.vs", "src/shaders/lighting.fs");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -86,26 +67,6 @@ int main()
 
         // render Box
         render_meshes(&shaderList[0]);
-
-        // render lighting object
-        lightingShader.UseShader();
-        lightingShader.SetUniformVec3("objectColor", glm::vec3(1.0f, 1.0f, 1.0f));
-
-        glm::mat4 lightView = mainCamera->GetViewMatrix();
-        int lightViewLocation = lightingShader.GetUniformView();
-        glUniformMatrix4fv(lightViewLocation, 1, GL_FALSE, glm::value_ptr(lightView));
-        glm::mat4 lightModel = glm::mat4(1.0f);
-        lightModel = glm::translate(lightModel, lightPos);
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-        int projectLocation = lightingShader.GetUniformProjection();
-        int lightModelLocation = lightingShader.GetUniformModel();
-        glUniformMatrix4fv(projectLocation, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(lightModelLocation, 1, GL_FALSE, glm::value_ptr(lightModel));
-        // render the cube
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         mainWindow.SwapBuffers();
@@ -171,88 +132,101 @@ void create_objects()
     };
 
     Mesh *obj1 = new Mesh();
-    obj1->CreateMesh(basic_cube_vertices, indices, 288, 6);
+    obj1->CreateMesh(basic_cube_vertices, indices, 288, 6, "src/resources/box_diffuse.png", "src/resources/box_specular.png");
     meshList.push_back(obj1);
 }
+
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(2.0f, 5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f, 3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f, 2.0f, -2.5f),
+    glm::vec3(1.5f, 0.2f, -1.5f),
+    glm::vec3(-1.3f, 1.0f, -1.5f)};
+
+glm::vec3 pointLightPositions[] = {
+    glm::vec3(0.7f, 0.2f, 2.0f),
+    glm::vec3(2.3f, -3.3f, -4.0f),
+    glm::vec3(-4.0f, 2.0f, -12.0f),
+    glm::vec3(0.0f, 0.0f, -3.0f)};
 
 void render_meshes(Shader *shader)
 {
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::mat4(1.0f) = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
     shader->UseShader();
 
-    // load textures (we now use a utility function to keep the code more organized)
-    // -----------------------------------------------------------------------------
-    unsigned int diffuseMap = loadTexture("src/resources/box_diffuse.png");
-    unsigned int specularMap = loadTexture("src/resources/box_specular.png");
-
-    glm::mat4 view = mainCamera->GetViewMatrix();
-
-    shader->SetUniformMat4("view", view);
-    shader->SetUniformMat4("model", model);
-    shader->SetUniformMat4("projection", projection);
-
     shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-
+    // Material
     shader->SetUniformInt("material.diffuse", 0);
     shader->SetUniformInt("material.specular", 1);
     shader->SetUniformFloat("material.shininess", 64.0f);
 
-    shader->SetUniformVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-    shader->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader->SetUniformVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
-    shader->SetUniformVec3("light.specular", glm::vec3(1.0, 1.0f, 1.0f));
-
     shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
+    // Directional Light
+    shader->SetUniformVec3("directionalLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+    shader->SetUniformVec3("directionalLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetUniformVec3("directionalLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+    shader->SetUniformVec3("directionalLight.specular", glm::vec3(1.0, 1.0f, 1.0f));
 
-    // bind diffuse map
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuseMap);
-    // bind specular map
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, specularMap);
+    // point light 1
+    shader->SetUniformVec3("pointLights[0].position", pointLightPositions[0]);
+    shader->SetUniformVec3("pointLights[0].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    shader->SetUniformVec3("pointLights[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    shader->SetUniformVec3("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetUniformFloat("pointLights[0].constant", 1.0f);
+    shader->SetUniformFloat("pointLights[0].linear", 0.09f);
+    shader->SetUniformFloat("pointLights[0].quadratic", 0.032f);
+    // point light 2
+    shader->SetUniformVec3("pointLights[1].position", pointLightPositions[1]);
+    shader->SetUniformVec3("pointLights[1].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    shader->SetUniformVec3("pointLights[1].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    shader->SetUniformVec3("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetUniformFloat("pointLights[1].constant", 1.0f);
+    shader->SetUniformFloat("pointLights[1].linear", 0.09f);
+    shader->SetUniformFloat("pointLights[1].quadratic", 0.032f);
+    // point light 3
+    shader->SetUniformVec3("pointLights[2].position", pointLightPositions[2]);
+    shader->SetUniformVec3("pointLights[2].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    shader->SetUniformVec3("pointLights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    shader->SetUniformVec3("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetUniformFloat("pointLights[2].constant", 1.0f);
+    shader->SetUniformFloat("pointLights[2].linear", 0.09f);
+    shader->SetUniformFloat("pointLights[2].quadratic", 0.032f);
+    // point light 4
+    shader->SetUniformVec3("pointLights[3].position", pointLightPositions[3]);
+    shader->SetUniformVec3("pointLights[3].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    shader->SetUniformVec3("pointLights[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    shader->SetUniformVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetUniformFloat("pointLights[3].constant", 1.0f);
+    shader->SetUniformFloat("pointLights[3].linear", 0.09f);
+    shader->SetUniformFloat("pointLights[3].quadratic", 0.032f);
 
-    meshList[0]->RenderMesh();
-}
+    // SpotLight
+    shader->SetUniformVec3("spotLight.position", mainCamera->GetPosition());
+    shader->SetUniformVec3("spotLight.direction", mainCamera->GetFront());
+    shader->SetUniformVec3("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    shader->SetUniformVec3("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
+    shader->SetUniformVec3("spotLight.specular", glm::vec3(1.0, 1.0f, 1.0f));
+    shader->SetUniformFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+    shader->SetUniformFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.5f)));
 
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-unsigned int loadTexture(char const *path)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
+    for (unsigned int i = 0; i < 10; i++)
     {
-        GLenum format = GL_RGB;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::mat4(1.0f) = glm::translate(model, cubePositions[i]);
+        float angle = 20.0f * i;
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        glm::mat4 view = mainCamera->GetViewMatrix();
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
+        shader->SetUniformMat4("view", view);
+        shader->SetUniformMat4("model", model);
+        shader->SetUniformMat4("projection", projection);
+        meshList[0]->RenderMesh();
     }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
 }

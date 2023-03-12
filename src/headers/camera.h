@@ -37,6 +37,7 @@ public:
 
     glm::mat4 GetViewMatrix();
     glm::vec3 GetPosition() { return position; };
+    glm::vec3 GetFront() { return front; };
     void ProcessInput(CAMERA_MOVEMENT direction, float deltaTime);
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void ProcessMouseScroll(float yoffset);

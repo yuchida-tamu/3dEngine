@@ -1,3 +1,4 @@
+#pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -9,11 +10,19 @@
 #include <string>
 #include <iostream>
 
+
 class Mesh
 {
 private:
-    unsigned int VAO, VBO, EBO, texture;
+    unsigned int VAO, VBO, EBO;
+    unsigned int diffuseMap, specularMap;
     GLsizei indexCount;
+
+    void prepareVertexData(GLfloat *vertices,
+                           unsigned int *indices,
+                           unsigned int verticesCount,
+                           unsigned int indicesCount);
+    unsigned int loadTexture(const char *texturePath);
 
 public:
     Mesh();
@@ -22,7 +31,24 @@ public:
         unsigned int *indices,
         unsigned int verticesCount,
         unsigned int indicesCount);
-    void AddTexture(const char *texturePath);
+    void CreateMesh(
+        GLfloat *vertices,
+        unsigned int *indices,
+        unsigned int verticesCount,
+        unsigned int indicesCount,
+        const char *diffuseMapPath);
+    void CreateMesh(
+        GLfloat *vertices,
+        unsigned int *indices,
+        unsigned int verticesCount,
+        unsigned int indicesCount,
+        const char *diffuseMapPath,
+        const char *specularMapPath);
+
+    unsigned int LoadDiffuseMap(const char *texturePath);
+    unsigned int LoadSpecularMap(const char *texturePath);
+    unsigned int GetDiffuseMap() { return diffuseMap; };
+    unsigned int GetSpecularMap() { return specularMap; };
     void RenderMesh();
     void ClearMesh();
     ~Mesh();

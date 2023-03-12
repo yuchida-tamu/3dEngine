@@ -11,6 +11,7 @@ CameraObject::CameraObject(glm::vec3 _position,
     pitch = _pitch;
     speed = SPEED;
     mouseSensitivity = SENSITIVITY;
+    front = glm::vec3(0.0f, 0.0f, -1.0f);
 
     updateCameraVectors();
 }
