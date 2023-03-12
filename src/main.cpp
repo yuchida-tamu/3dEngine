@@ -160,12 +160,13 @@ void render_meshes(Shader *shader)
     shader->UseShader();
 
     shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
+     
     // Material
     shader->SetUniformInt("material.diffuse", 0);
     shader->SetUniformInt("material.specular", 1);
     shader->SetUniformFloat("material.shininess", 64.0f);
 
-    shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
     // Directional Light
     shader->SetUniformVec3("directionalLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
     shader->SetUniformVec3("directionalLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
