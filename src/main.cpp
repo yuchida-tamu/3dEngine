@@ -12,6 +12,9 @@
 #include "window.h"
 #include "camera.h"
 #include "mesh_data.h"
+#include "directional_light.h"
+#include "point_light.h"
+#include "spot_light.h"
 
 Window mainWindow;
 CameraObject *mainCamera;
@@ -161,50 +164,65 @@ void render_meshes(Shader *shader)
 
     shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
     shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
-     
+
     // Material
     shader->SetUniformInt("material.diffuse", 0);
     shader->SetUniformInt("material.specular", 1);
     shader->SetUniformFloat("material.shininess", 64.0f);
 
     // Directional Light
-    shader->SetUniformVec3("directionalLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-    shader->SetUniformVec3("directionalLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader->SetUniformVec3("directionalLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
-    shader->SetUniformVec3("directionalLight.specular", glm::vec3(1.0, 1.0f, 1.0f));
+    DirectionalLight dirLight = DirectionalLight(
+        glm::vec3(-0.2f, -1.0f, -0.3f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(1.0, 1.0f, 1.0f));
+
+    PointLight pointLight = PointLight(
+        pointLightPositions[0],
+        glm::vec3(0.05f, 0.05f, 0.05f),
+        glm::vec3(0.8f, 0.8f, 0.8f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        1.0f,
+        0.09f,
+        0.032f);
+
+    shader->SetUniformVec3("directionalLight.direction", dirLight.GetDirectionVec3());
+    shader->SetUniformVec3("directionalLight.ambient", dirLight.GetAmbientVec3());
+    shader->SetUniformVec3("directionalLight.diffuse", dirLight.GetDiffuseVec3());
+    shader->SetUniformVec3("directionalLight.specular", dirLight.GetSpecularVec3());
 
     // point light 1
     shader->SetUniformVec3("pointLights[0].position", pointLightPositions[0]);
-    shader->SetUniformVec3("pointLights[0].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    shader->SetUniformVec3("pointLights[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    shader->SetUniformVec3("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader->SetUniformFloat("pointLights[0].constant", 1.0f);
-    shader->SetUniformFloat("pointLights[0].linear", 0.09f);
-    shader->SetUniformFloat("pointLights[0].quadratic", 0.032f);
+    shader->SetUniformVec3("pointLights[0].ambient", pointLight.GetAmbientVec3());
+    shader->SetUniformVec3("pointLights[0].diffuse", pointLight.GetDiffuseVec3());
+    shader->SetUniformVec3("pointLights[0].specular", pointLight.GetSpecularVec3());
+    shader->SetUniformFloat("pointLights[0].constant", pointLight.GetConstant());
+    shader->SetUniformFloat("pointLights[0].linear", pointLight.GetLinear());
+    shader->SetUniformFloat("pointLights[0].quadratic", pointLight.GetQuadratic());
     // point light 2
     shader->SetUniformVec3("pointLights[1].position", pointLightPositions[1]);
-    shader->SetUniformVec3("pointLights[1].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    shader->SetUniformVec3("pointLights[1].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    shader->SetUniformVec3("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader->SetUniformFloat("pointLights[1].constant", 1.0f);
-    shader->SetUniformFloat("pointLights[1].linear", 0.09f);
-    shader->SetUniformFloat("pointLights[1].quadratic", 0.032f);
+    shader->SetUniformVec3("pointLights[1].ambient", pointLight.GetAmbientVec3());
+    shader->SetUniformVec3("pointLights[1].diffuse", pointLight.GetDiffuseVec3());
+    shader->SetUniformVec3("pointLights[1].specular", pointLight.GetSpecularVec3());
+    shader->SetUniformFloat("pointLights[1].constant", pointLight.GetConstant());
+    shader->SetUniformFloat("pointLights[1].linear", pointLight.GetLinear());
+    shader->SetUniformFloat("pointLights[1].quadratic", pointLight.GetQuadratic());
     // point light 3
     shader->SetUniformVec3("pointLights[2].position", pointLightPositions[2]);
-    shader->SetUniformVec3("pointLights[2].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    shader->SetUniformVec3("pointLights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    shader->SetUniformVec3("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader->SetUniformFloat("pointLights[2].constant", 1.0f);
-    shader->SetUniformFloat("pointLights[2].linear", 0.09f);
-    shader->SetUniformFloat("pointLights[2].quadratic", 0.032f);
+    shader->SetUniformVec3("pointLights[2].ambient", pointLight.GetAmbientVec3());
+    shader->SetUniformVec3("pointLights[2].diffuse", pointLight.GetDiffuseVec3());
+    shader->SetUniformVec3("pointLights[2].specular", pointLight.GetSpecularVec3());
+    shader->SetUniformFloat("pointLights[2].constant", pointLight.GetConstant());
+    shader->SetUniformFloat("pointLights[2].linear", pointLight.GetLinear());
+    shader->SetUniformFloat("pointLights[2].quadratic", pointLight.GetQuadratic());
     // point light 4
     shader->SetUniformVec3("pointLights[3].position", pointLightPositions[3]);
-    shader->SetUniformVec3("pointLights[3].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    shader->SetUniformVec3("pointLights[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    shader->SetUniformVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader->SetUniformFloat("pointLights[3].constant", 1.0f);
-    shader->SetUniformFloat("pointLights[3].linear", 0.09f);
-    shader->SetUniformFloat("pointLights[3].quadratic", 0.032f);
+    shader->SetUniformVec3("pointLights[3].ambient", pointLight.GetAmbientVec3());
+    shader->SetUniformVec3("pointLights[3].diffuse", pointLight.GetDiffuseVec3());
+    shader->SetUniformVec3("pointLights[3].specular", pointLight.GetSpecularVec3());
+    shader->SetUniformFloat("pointLights[3].constant", pointLight.GetConstant());
+    shader->SetUniformFloat("pointLights[3].linear", pointLight.GetLinear());
+    shader->SetUniformFloat("pointLights[3].quadratic", pointLight.GetQuadratic());
 
     // SpotLight
     shader->SetUniformVec3("spotLight.position", mainCamera->GetPosition());
@@ -221,6 +239,7 @@ void render_meshes(Shader *shader)
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::mat4(1.0f) = glm::translate(model, cubePositions[i]);
         float angle = 20.0f * i;
+        angle += glfwGetTime() * i;
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
         glm::mat4 view = mainCamera->GetViewMatrix();
