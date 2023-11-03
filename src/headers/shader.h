@@ -15,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "directional_light.h"
+#include "point_light.h"
 
 class Shader
 {
@@ -37,6 +38,7 @@ public:
     void SetUniformTextureIndex(const char* name, uint );
     // Lighting
     void SetUniformDirectionalLight(DirectionalLight light);
+    void SetUniformPointLight(PointLight light, glm::vec3);
 
     GLuint GetUniformProjection() { return uniformProjection; };
     GLuint GetUniformView() { return uniformView; };

@@ -170,39 +170,12 @@ void render_meshes(Shader *shader)
 
     // set up Directional Light in Shader
     shader->SetUniformDirectionalLight(dirLight);
-    // point light 1
-    shader->SetUniformVec3("pointLights[0].position", pointLightPositions[0]);
-    shader->SetUniformVec3("pointLights[0].ambient", pointLight.GetAmbientVec3());
-    shader->SetUniformVec3("pointLights[0].diffuse", pointLight.GetDiffuseVec3());
-    shader->SetUniformVec3("pointLights[0].specular", pointLight.GetSpecularVec3());
-    shader->SetUniformFloat("pointLights[0].constant", pointLight.GetConstant());
-    shader->SetUniformFloat("pointLights[0].linear", pointLight.GetLinear());
-    shader->SetUniformFloat("pointLights[0].quadratic", pointLight.GetQuadratic());
-    // point light 2
-    shader->SetUniformVec3("pointLights[1].position", pointLightPositions[1]);
-    shader->SetUniformVec3("pointLights[1].ambient", pointLight.GetAmbientVec3());
-    shader->SetUniformVec3("pointLights[1].diffuse", pointLight.GetDiffuseVec3());
-    shader->SetUniformVec3("pointLights[1].specular", pointLight.GetSpecularVec3());
-    shader->SetUniformFloat("pointLights[1].constant", pointLight.GetConstant());
-    shader->SetUniformFloat("pointLights[1].linear", pointLight.GetLinear());
-    shader->SetUniformFloat("pointLights[1].quadratic", pointLight.GetQuadratic());
-    // point light 3
-    shader->SetUniformVec3("pointLights[2].position", pointLightPositions[2]);
-    shader->SetUniformVec3("pointLights[2].ambient", pointLight.GetAmbientVec3());
-    shader->SetUniformVec3("pointLights[2].diffuse", pointLight.GetDiffuseVec3());
-    shader->SetUniformVec3("pointLights[2].specular", pointLight.GetSpecularVec3());
-    shader->SetUniformFloat("pointLights[2].constant", pointLight.GetConstant());
-    shader->SetUniformFloat("pointLights[2].linear", pointLight.GetLinear());
-    shader->SetUniformFloat("pointLights[2].quadratic", pointLight.GetQuadratic());
-    // point light 4
-    shader->SetUniformVec3("pointLights[3].position", pointLightPositions[3]);
-    shader->SetUniformVec3("pointLights[3].ambient", pointLight.GetAmbientVec3());
-    shader->SetUniformVec3("pointLights[3].diffuse", pointLight.GetDiffuseVec3());
-    shader->SetUniformVec3("pointLights[3].specular", pointLight.GetSpecularVec3());
-    shader->SetUniformFloat("pointLights[3].constant", pointLight.GetConstant());
-    shader->SetUniformFloat("pointLights[3].linear", pointLight.GetLinear());
-    shader->SetUniformFloat("pointLights[3].quadratic", pointLight.GetQuadratic());
-
+    // point light 
+    shader->SetUniformPointLight(pointLight, pointLightPositions[0]);
+    shader->SetUniformPointLight(pointLight, pointLightPositions[1]);
+    shader->SetUniformPointLight(pointLight, pointLightPositions[2]);
+    shader->SetUniformPointLight(pointLight, pointLightPositions[3]);
+    
     // SpotLight
     shader->SetUniformVec3("spotLight.position", mainCamera->GetPosition());
     shader->SetUniformVec3("spotLight.direction", mainCamera->GetFront());

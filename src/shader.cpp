@@ -67,6 +67,16 @@ void Shader::SetUniformDirectionalLight(DirectionalLight light){
     SetUniformVec3("directionalLight.specular", light.GetSpecularVec3());
 }
 
+void Shader::SetUniformPointLight(PointLight light, glm::vec3 position){
+   SetUniformVec3("pointLights[0].position", position);
+   SetUniformVec3("pointLights[0].ambient", light.GetAmbientVec3());
+   SetUniformVec3("pointLights[0].diffuse", light.GetDiffuseVec3());
+   SetUniformVec3("pointLights[0].specular", light.GetSpecularVec3());
+   SetUniformFloat("pointLights[0].constant", light.GetConstant());
+   SetUniformFloat("pointLights[0].linear", light.GetLinear());
+   SetUniformFloat("pointLights[0].quadratic", light.GetQuadratic());
+}
+
 void Shader::ClearShader()
 {
     if (shaderID != 0)
