@@ -168,11 +168,8 @@ void render_meshes(Shader *shader)
         0.09f,
         0.032f);
 
-    shader->SetUniformVec3("directionalLight.direction", dirLight.GetDirectionVec3());
-    shader->SetUniformVec3("directionalLight.ambient", dirLight.GetAmbientVec3());
-    shader->SetUniformVec3("directionalLight.diffuse", dirLight.GetDiffuseVec3());
-    shader->SetUniformVec3("directionalLight.specular", dirLight.GetSpecularVec3());
-
+    // set up Directional Light in Shader
+    shader->SetUniformDirectionalLight(dirLight);
     // point light 1
     shader->SetUniformVec3("pointLights[0].position", pointLightPositions[0]);
     shader->SetUniformVec3("pointLights[0].ambient", pointLight.GetAmbientVec3());

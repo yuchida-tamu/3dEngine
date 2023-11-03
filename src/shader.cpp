@@ -60,6 +60,13 @@ void Shader::SetUniformTextureIndex(const char *name, GLuint index)
     glUniform1i(uniformLoc, index);
 }
 
+void Shader::SetUniformDirectionalLight(DirectionalLight light){
+    SetUniformVec3("directionalLight.direction", light.GetDirectionVec3());
+    SetUniformVec3("directionalLight.ambient", light.GetAmbientVec3());
+    SetUniformVec3("directionalLight.diffuse", light.GetDiffuseVec3());
+    SetUniformVec3("directionalLight.specular", light.GetSpecularVec3());
+}
+
 void Shader::ClearShader()
 {
     if (shaderID != 0)
