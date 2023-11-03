@@ -171,10 +171,9 @@ void render_meshes(Shader *shader)
     // set up Directional Light in Shader
     shader->SetUniformDirectionalLight(dirLight);
     // point light 
-    shader->SetUniformPointLight(pointLight, pointLightPositions[0]);
-    shader->SetUniformPointLight(pointLight, pointLightPositions[1]);
-    shader->SetUniformPointLight(pointLight, pointLightPositions[2]);
-    shader->SetUniformPointLight(pointLight, pointLightPositions[3]);
+    for(const glm::vec3 pos : pointLightPositions){
+        shader->SetUniformPointLight(pointLight, pos);
+    }
     
     // SpotLight
     shader->SetUniformVec3("spotLight.position", mainCamera->GetPosition());
