@@ -54,6 +54,23 @@ int Window::Initialize()
     return 0;
 }
 
+void Window::ProcessInput(CameraObject *camera){
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
+    if (glfwGetKey(mainWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(mainWindow, true);
+    if (glfwGetKey(mainWindow, GLFW_KEY_W) == GLFW_PRESS)
+        camera->ProcessInput(FORWARD, deltaTime);
+    if (glfwGetKey(mainWindow, GLFW_KEY_S) == GLFW_PRESS)
+        camera->ProcessInput(BACKWARD, deltaTime);
+    if (glfwGetKey(mainWindow, GLFW_KEY_A) == GLFW_PRESS)
+        camera->ProcessInput(LEFT, deltaTime);
+    if (glfwGetKey(mainWindow, GLFW_KEY_D) == GLFW_PRESS)
+        camera->ProcessInput(RIGHT, deltaTime);
+}
+
 Window::~Window()
 {
     glfwDestroyWindow(mainWindow);

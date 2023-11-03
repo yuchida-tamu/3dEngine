@@ -14,6 +14,8 @@ private:
     GLint width, height;
     GLint bufferWidth, bufferHeight;
 
+    float deltaTime, lastFrame = 0.0f;
+
 public:
     Window();
 
@@ -24,6 +26,8 @@ public:
 
     bool GetShouldClose() { return glfwWindowShouldClose(mainWindow); }
     void SwapBuffers() { glfwSwapBuffers(mainWindow); }
+
+    void ProcessInput(CameraObject *camera);
 
     ~Window();
 };

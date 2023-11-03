@@ -62,7 +62,7 @@ int main()
     {
 
         // input
-        processInput(mainWindow.GetWindow(), mainCamera);
+        mainWindow.ProcessInput(mainCamera);
 
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -82,24 +82,6 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
-}
-
-void processInput(GLFWwindow *window, CameraObject *camera)
-{
-    float currentFrame = glfwGetTime();
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera->ProcessInput(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera->ProcessInput(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera->ProcessInput(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->ProcessInput(RIGHT, deltaTime);
 }
 
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
