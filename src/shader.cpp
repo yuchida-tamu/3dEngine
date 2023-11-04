@@ -77,6 +77,16 @@ void Shader::SetUniformPointLight(PointLight light, glm::vec3 position){
    SetUniformFloat("pointLights[0].quadratic", light.GetQuadratic());
 }
 
+void Shader::SetUniformSpotLight(SpotLight light){
+    SetUniformVec3("spotLight.position", light.GetPositionVec3());
+    SetUniformVec3("spotLight.direction", light.GetDirectionVec3());
+    SetUniformVec3("spotLight.ambient", light.GetAmbientVec3());
+    SetUniformVec3("spotLight.diffuse", light.GetDiffuseVec3()); // darken diffuse light a bit
+    SetUniformVec3("spotLight.specular", light.GetSpecularVec3());
+    SetUniformFloat("spotLight.innerCutOff", light.GetInnerCutOff());
+    SetUniformFloat("spotLight.outerCutOff", light.GetOuterCutOff());
+}
+
 void Shader::ClearShader()
 {
     if (shaderID != 0)

@@ -176,13 +176,17 @@ void render_meshes(Shader *shader)
     }
     
     // SpotLight
-    shader->SetUniformVec3("spotLight.position", mainCamera->GetPosition());
-    shader->SetUniformVec3("spotLight.direction", mainCamera->GetFront());
-    shader->SetUniformVec3("spotLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    shader->SetUniformVec3("spotLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f)); // darken diffuse light a bit
-    shader->SetUniformVec3("spotLight.specular", glm::vec3(1.0, 1.0f, 1.0f));
-    shader->SetUniformFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-    shader->SetUniformFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.5f)));
+    SpotLight spotLight = SpotLight(
+        mainCamera->GetPosition(),
+        mainCamera->GetFront(),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0, 1.0f, 1.0f),
+        glm::cos(glm::radians(12.5f)),
+        glm::cos(glm::radians(15.5f))
+    );
+    shader->SetUniformSpotLight( spotLight );
+
 
     for (unsigned int i = 0; i < 10; i++)
     {
