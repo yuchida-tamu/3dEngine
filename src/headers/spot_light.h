@@ -26,6 +26,10 @@ public:
 
     glm::vec3 GetPositionVec3() { return position; }
     glm::vec3 GetDirectionVec3() { return direction; }
+
+    void SetPositionVec3( glm::vec3 _position ){ position = _position; }
+    void SetDirectionVec3( glm::vec3 _direction ){ direction = _direction; }
+
     float GetInnerCutOff() { return innerCutOff; }
     float GetOuterCutOff() { return outerCutOff; }
 

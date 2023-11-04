@@ -36,7 +36,7 @@ glm::vec3 lightPos(-2.0f, 3.0f, 0.5f);
 
 void create_shaders();
 void create_objects();
-void render_meshes(Shader *shader);
+void render_meshes(Shader *shader, SpotLight spotLight);
 void processInput(GLFWwindow *window, CameraObject *camera);
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
 
@@ -46,6 +46,16 @@ int main()
     mainWindow.Initialize();
     mainCamera = new CameraObject();
     glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
+
+    SpotLight spotLight = SpotLight(
+        mainCamera->GetPosition(),
+        mainCamera->GetFront(),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0, 1.0f, 1.0f),
+        glm::cos(glm::radians(12.5f)),
+        glm::cos(glm::radians(15.5f))
+    );
 
     create_objects();
 
@@ -68,8 +78,12 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // update lighting
+        spotLight.SetPositionVec3(mainCamera->GetPosition());
+        spotLight.SetDirectionVec3(mainCamera->GetFront());
+
         // render Box
-        render_meshes(&shaderList[0]);
+        render_meshes(&shaderList[0], spotLight);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         mainWindow.SwapBuffers();
@@ -139,7 +153,7 @@ glm::vec3 pointLightPositions[] = {
     glm::vec3(-4.0f, 2.0f, -12.0f),
     glm::vec3(0.0f, 0.0f, -3.0f)};
 
-void render_meshes(Shader *shader)
+void render_meshes(Shader *shader, SpotLight spotLight )
 {
 
     shader->UseShader();
@@ -175,16 +189,6 @@ void render_meshes(Shader *shader)
         shader->SetUniformPointLight(pointLight, pos);
     }
     
-    // SpotLight
-    SpotLight spotLight = SpotLight(
-        mainCamera->GetPosition(),
-        mainCamera->GetFront(),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(1.0, 1.0f, 1.0f),
-        glm::cos(glm::radians(12.5f)),
-        glm::cos(glm::radians(15.5f))
-    );
     shader->SetUniformSpotLight( spotLight );
 
 
