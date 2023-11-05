@@ -61,7 +61,7 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    // uncomment this call to draw in wireframe polygons.
+    // uncomment this call to draw in wire frame polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     SpotLight spotLight = SpotLight(
@@ -73,6 +73,12 @@ int main()
         glm::cos(glm::radians(12.5f)),
         glm::cos(glm::radians(15.5f))
     );
+
+    DirectionalLight dirLight = DirectionalLight(
+            glm::vec3(-0.2f, -1.0f, -0.3f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(1.0, 1.0f, 1.0f));
 
     
 
@@ -103,12 +109,8 @@ int main()
             );
             pointLight.SetUniform(&shaderList[0]);
         }
+
         
-        DirectionalLight dirLight = DirectionalLight(
-            glm::vec3(-0.2f, -1.0f, -0.3f),
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(1.0, 1.0f, 1.0f));
 
         dirLight.SetUniform(&shaderList[0]);
 
