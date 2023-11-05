@@ -22,5 +22,19 @@ public:
     float GetLinear() { return linear; }
     float GetQuadratic() { return quadratic; }
 
-    ~PointLight() {}
+    void SetPosition(glm::vec3 _position){
+        position = _position;
+    }
+
+    void SetUniform(Shader *shader){
+        shader->SetUniformVec3("pointLights[0].position", position);
+        shader->SetUniformVec3("pointLights[0].ambient", GetAmbientVec3());
+        shader->SetUniformVec3("pointLights[0].diffuse", GetDiffuseVec3());
+        shader->SetUniformVec3("pointLights[0].specular", GetSpecularVec3());
+        shader->SetUniformFloat("pointLights[0].constant", constant);
+        shader->SetUniformFloat("pointLights[0].linear", linear);
+        shader->SetUniformFloat("pointLights[0].quadratic", quadratic);
+    }
+
+    ~PointLight(){};
 };

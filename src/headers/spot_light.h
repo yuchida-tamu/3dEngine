@@ -1,6 +1,7 @@
 #pragma once
 #include "light.h"
 
+
 class SpotLight : public Light
 {
 private:
@@ -30,8 +31,18 @@ public:
     void SetPositionVec3( glm::vec3 _position ){ position = _position; }
     void SetDirectionVec3( glm::vec3 _direction ){ direction = _direction; }
 
+    void SetUniform(Shader *shader){
+        shader->SetUniformVec3("spotLight.position", position);
+        shader->SetUniformVec3("spotLight.direction", direction);
+        shader->SetUniformVec3("spotLight.ambient", GetAmbientVec3());
+        shader->SetUniformVec3("spotLight.diffuse", GetDiffuseVec3()); // darken diffuse light a bit
+        shader->SetUniformVec3("spotLight.specular", GetSpecularVec3());
+        shader->SetUniformFloat("spotLight.innerCutOff", innerCutOff);
+        shader->SetUniformFloat("spotLight.outerCutOff", outerCutOff);
+    }
+
     float GetInnerCutOff() { return innerCutOff; }
     float GetOuterCutOff() { return outerCutOff; }
 
-    ~SpotLight() {}
+    ~SpotLight() {};
 };

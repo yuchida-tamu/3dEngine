@@ -14,10 +14,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "directional_light.h"
-#include "point_light.h"
-#include "spot_light.h"
-
 class Shader
 {
 private:
@@ -37,10 +33,6 @@ public:
     void SetUniformVec3(const char* name, glm::vec3 vec);
     void SetUniformMat4(const char* name, glm::mat4 vec);
     void SetUniformTextureIndex(const char* name, uint );
-    // Lighting
-    void SetUniformDirectionalLight(DirectionalLight light);
-    void SetUniformPointLight(PointLight light, glm::vec3 position);
-    void SetUniformSpotLight(SpotLight light);
 
     GLuint GetUniformProjection() { return uniformProjection; };
     GLuint GetUniformView() { return uniformView; };

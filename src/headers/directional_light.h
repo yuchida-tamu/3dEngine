@@ -13,4 +13,12 @@ public:
         direction = _direction;
     };
     glm::vec3 GetDirectionVec3() { return direction; };
+
+    void SetUniform(Shader *shader){
+        shader->SetUniformVec3("directionalLight.direction", direction);
+        shader->SetUniformVec3("directionalLight.ambient", GetAmbientVec3());
+        shader->SetUniformVec3("directionalLight.diffuse", GetDiffuseVec3());
+        shader->SetUniformVec3("directionalLight.specular", GetSpecularVec3());
+    }
+
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "shader.h"
 
 class Light
 {
@@ -18,6 +19,8 @@ public:
     glm::vec3 GetAmbientVec3() { return ambient; };
     glm::vec3 GetDiffuseVec3() { return diffuse; };
     glm::vec3 GetSpecularVec3() { return specular; };
+
+    virtual void SetUniform(Shader *shader) = 0;
 
     ~Light()
     {
