@@ -86,25 +86,31 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //update position of lighting
+        // setup lighting
         spotLight.SetDirectionVec3(mainCamera->GetFront());
         spotLight.SetPositionVec3(mainCamera->GetPosition());
+        spotLight.SetUniform(&shaderList[0]);
 
         for(glm::vec3 pos : pointLightPositions){
-        PointLight pointLight = PointLight(
-            pos,
-            glm::vec3(0.05f, 0.05f, 0.05f),
-            glm::vec3(0.8f, 0.8f, 0.8f),
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            1.0f,
-            0.09f,
-            0.032f
-        );
-        pointLight.SetUniform(&shaderList[0]);
-    }
+            PointLight pointLight = PointLight(
+                pos,
+                glm::vec3(0.05f, 0.05f, 0.05f),
+                glm::vec3(0.8f, 0.8f, 0.8f),
+                glm::vec3(1.0f, 1.0f, 1.0f),
+                1.0f,
+                0.09f,
+                0.032f
+            );
+            pointLight.SetUniform(&shaderList[0]);
+        }
+        
+        DirectionalLight dirLight = DirectionalLight(
+            glm::vec3(-0.2f, -1.0f, -0.3f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(1.0, 1.0f, 1.0f));
 
-        // update lighting
-        spotLight.SetUniform(&shaderList[0]);
+        dirLight.SetUniform(&shaderList[0]);
 
         // render Box
         render_meshes(&shaderList[0]);
@@ -185,14 +191,6 @@ void render_meshes(Shader *shader)
     shader->SetUniformInt("material.specular", 1);
     shader->SetUniformFloat("material.shininess", 64.0f);
 
-    // Directional Light
-    DirectionalLight dirLight = DirectionalLight(
-        glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(1.0, 1.0f, 1.0f));
-
-    dirLight.SetUniform(shader);
 
     for (unsigned int i = 0; i < 10; i++)
     {
