@@ -33,13 +33,6 @@ float yoffset = 0.0f;
 
 // lighting
 glm::vec3 lightPos(-2.0f, 3.0f, 0.5f);
-glm::vec3 pointLightPositions[] = {
-    glm::vec3(0.7f, 0.2f, 2.0f),
-    glm::vec3(2.3f, -3.3f, -4.0f),
-    glm::vec3(-4.0f, 2.0f, -12.0f),
-    glm::vec3(0.0f, 0.0f, -3.0f)
-};
-
 
 void create_shaders();
 void create_objects();
@@ -75,12 +68,20 @@ int main()
     );
 
     DirectionalLight dirLight = DirectionalLight(
-            glm::vec3(-0.2f, -1.0f, -0.3f),
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(1.0, 1.0f, 1.0f));
+        glm::vec3(-0.2f, -1.0f, -0.3f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(1.0, 1.0f, 1.0f));
 
-    
+    PointLight pointLight = PointLight(
+        glm::vec3(0.7f, 0.2f, 2.0f),
+        glm::vec3(0.05f, 0.05f, 0.05f),
+        glm::vec3(0.8f, 0.8f, 0.8f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        1.0f,
+        0.09f,
+        0.032f
+    );
 
     // render loop
     while (!mainWindow.GetShouldClose())
@@ -96,22 +97,7 @@ int main()
         spotLight.SetDirectionVec3(mainCamera->GetFront());
         spotLight.SetPositionVec3(mainCamera->GetPosition());
         spotLight.SetUniform(&shaderList[0]);
-
-        for(glm::vec3 pos : pointLightPositions){
-            PointLight pointLight = PointLight(
-                pos,
-                glm::vec3(0.05f, 0.05f, 0.05f),
-                glm::vec3(0.8f, 0.8f, 0.8f),
-                glm::vec3(1.0f, 1.0f, 1.0f),
-                1.0f,
-                0.09f,
-                0.032f
-            );
-            pointLight.SetUniform(&shaderList[0]);
-        }
-
-        
-
+        pointLight.SetUniform(&shaderList[0]);
         dirLight.SetUniform(&shaderList[0]);
 
         // render Box
