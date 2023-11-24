@@ -15,6 +15,7 @@
 #include "directional_light.h"
 #include "point_light.h"
 #include "spot_light.h"
+#include "game_object.h"
 
 Window mainWindow;
 CameraObject *mainCamera;
@@ -35,12 +36,11 @@ Shader *shader1;
 
 // lighting
 glm::vec3 lightPos(-2.0f, 3.0f, 0.5f);
+std::vector<Light *> lightList;
 
-void create_shaders();
-void create_objects();
-void render_meshes(Shader *shader);
 void processInput(GLFWwindow *window, CameraObject *camera);
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
+void setup_lights();
 
 int main()
 {
@@ -50,10 +50,19 @@ int main()
     // glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
 
     shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");    
-    create_objects();
 
-    // build and compile our shader program
-    create_shaders();
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+
+    // Prepare a Box object
+    Mesh *boxMesh = new Mesh();
+    boxMesh->CreateMesh(basic_cube_vertices, indices, 288, 6, "src/resources/box_diffuse.png", "src/resources/box_specular.png");
+    GameObject *boxObject = new GameObject(mainCamera, boxMesh);
+
+    // Prepare lights
+    setup_lights();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -72,7 +81,17 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render Box
-        render_meshes(shader1);
+        shader1->UseShader();
+        shader1->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        shader1->SetUniformVec3("viewPos", mainCamera->GetPosition());;
+        for(Light* light : lightList)
+        {
+            light->SetUniform(shader1);
+        }
+        boxObject->Render(shader1);
+        glUseProgram(0);
+
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         mainWindow.SwapBuffers();
 
@@ -105,33 +124,9 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
     mainCamera->ProcessMouseMovement(xoffset, yoffset);
 }
 
-void create_shaders()
+void setup_lights()
 {
-    // Shader *shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");
-    shaderList.push_back(*shader1);
-}
-
-void create_objects()
-{
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-
-    Mesh *obj1 = new Mesh();
-    obj1->CreateMesh(basic_cube_vertices, indices, 288, 6, "src/resources/box_diffuse.png", "src/resources/box_specular.png");
-    meshList.push_back(obj1);
-}
-
-glm::vec3 cubePosition = glm::vec3(0.0f, 0.0f, -2.0f);
-
-void render_meshes(Shader *shader)
-{
-
-    shader->UseShader();
-
-
-    SpotLight spotLight = SpotLight(
+    SpotLight * spotLight = new SpotLight(
         mainCamera->GetPosition(),
         mainCamera->GetFront(),
         glm::vec3(0.2f, 0.2f, 0.2f),
@@ -141,13 +136,13 @@ void render_meshes(Shader *shader)
         glm::cos(glm::radians(15.5f))
     );
 
-    DirectionalLight dirLight = DirectionalLight(
+    DirectionalLight *dirLight = new DirectionalLight(
         glm::vec3(-0.2f, -1.0f, -0.3f),
         glm::vec3(0.2f, 0.2f, 0.2f),
         glm::vec3(0.2f, 0.2f, 0.2f),
         glm::vec3(1.0, 1.0f, 1.0f));
 
-    PointLight pointLight = PointLight(
+    PointLight *pointLight = new PointLight(
         glm::vec3(0.7f, 0.2f, 2.0f),
         glm::vec3(0.05f, 0.05f, 0.05f),
         glm::vec3(0.8f, 0.8f, 0.8f),
@@ -157,34 +152,11 @@ void render_meshes(Shader *shader)
         0.032f
     );
 
+    spotLight->SetDirectionVec3(mainCamera->GetFront());
+    spotLight->SetPositionVec3(mainCamera->GetPosition());
+    
+    lightList.push_back(spotLight);
+    lightList.push_back(dirLight);
+    lightList.push_back(pointLight);
 
-    // setup lighting
-    spotLight.SetDirectionVec3(mainCamera->GetFront());
-    spotLight.SetPositionVec3(mainCamera->GetPosition());
-    spotLight.SetUniform(shader1);
-    pointLight.SetUniform(shader1);
-    dirLight.SetUniform(shader1);
-
-
-    shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-    shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
-
-    // Material
-    shader->SetUniformInt("material.diffuse", 0);
-    shader->SetUniformInt("material.specular", 1);
-    shader->SetUniformFloat("material.shininess", 64.0f);
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::mat4(1.0f) = glm::translate(model, cubePosition);
-    float angle = 0.0f;
-    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-    glm::mat4 view = mainCamera->GetViewMatrix();
-
-    shader->SetUniformMat4("view", view);
-    shader->SetUniformMat4("model", model);
-    shader->SetUniformMat4("projection", projection);
-    meshList[0]->RenderMesh();
-
-    glUseProgram(0);
 }
