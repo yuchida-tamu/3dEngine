@@ -45,7 +45,8 @@ int main()
     mainWindow = Window();
     mainWindow.Initialize();
     mainCamera = new CameraObject();
-    glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
+    // glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
+
 
     create_objects();
 
@@ -86,8 +87,8 @@ int main()
     // render loop
     while (!mainWindow.GetShouldClose())
     {
-        // input
-        mainWindow.ProcessInput(mainCamera);
+        // input: camera movement
+        // mainWindow.ProcessInput(mainCamera);
 
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -153,18 +154,7 @@ void create_objects()
     meshList.push_back(obj1);
 }
 
-glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(2.0f, 5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3(2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f, 3.0f, -7.5f),
-    glm::vec3(1.3f, -2.0f, -2.5f),
-    glm::vec3(1.5f, 2.0f, -2.5f),
-    glm::vec3(1.5f, 0.2f, -1.5f),
-    glm::vec3(-1.3f, 1.0f, -1.5f)};
-
+glm::vec3 cubePosition = glm::vec3(0.0f, 0.0f, -2.0f);
 
 void render_meshes(Shader *shader)
 {
@@ -179,21 +169,15 @@ void render_meshes(Shader *shader)
     shader->SetUniformInt("material.specular", 1);
     shader->SetUniformFloat("material.shininess", 64.0f);
 
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::mat4(1.0f) = glm::translate(model, cubePosition);
+    float angle = 0.0f;
+    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    glm::mat4 view = mainCamera->GetViewMatrix();
 
-    for (unsigned int i = 0; i < 10; i++)
-    {
-
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::mat4(1.0f) = glm::translate(model, cubePositions[i]);
-        float angle = 20.0f * i;
-        angle += glfwGetTime() * i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-        glm::mat4 view = mainCamera->GetViewMatrix();
-
-        shader->SetUniformMat4("view", view);
-        shader->SetUniformMat4("model", model);
-        shader->SetUniformMat4("projection", projection);
-        meshList[0]->RenderMesh();
-    }
+    shader->SetUniformMat4("view", view);
+    shader->SetUniformMat4("model", model);
+    shader->SetUniformMat4("projection", projection);
+    meshList[0]->RenderMesh();
 }
