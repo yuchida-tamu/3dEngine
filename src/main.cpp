@@ -88,7 +88,7 @@ int main()
     while (!mainWindow.GetShouldClose())
     {
         // input: camera movement
-        // mainWindow.ProcessInput(mainCamera);
+        mainWindow.ProcessInput(mainCamera);
 
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
