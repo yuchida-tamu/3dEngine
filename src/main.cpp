@@ -42,6 +42,7 @@ void processInput(GLFWwindow *window, CameraObject *camera);
 void mouse_callback(GLFWwindow *window, double xposIn, double yposIn);
 void setup_lights();
 
+
 int main()
 {
     mainWindow = Window();
@@ -63,6 +64,15 @@ int main()
 
     // Prepare lights
     setup_lights();
+    SpotLight * spotLight = new SpotLight(
+        mainCamera->GetPosition(),
+        mainCamera->GetFront(),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0, 1.0f, 1.0f),
+        glm::cos(glm::radians(12.5f)),
+        glm::cos(glm::radians(15.5f))
+    );
 
     glEnable(GL_DEPTH_TEST);
 
@@ -88,6 +98,10 @@ int main()
         {
             light->SetUniform(shader1);
         }
+        spotLight->SetDirectionVec3(mainCamera->GetFront());
+        spotLight->SetPositionVec3(mainCamera->GetPosition());
+        spotLight->SetUniform(shader1);
+   
         boxObject->Render(shader1);
         glUseProgram(0);
 
@@ -126,15 +140,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 
 void setup_lights()
 {
-    SpotLight * spotLight = new SpotLight(
-        mainCamera->GetPosition(),
-        mainCamera->GetFront(),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(1.0, 1.0f, 1.0f),
-        glm::cos(glm::radians(12.5f)),
-        glm::cos(glm::radians(15.5f))
-    );
+   
 
     DirectionalLight *dirLight = new DirectionalLight(
         glm::vec3(-0.2f, -1.0f, -0.3f),
@@ -151,11 +157,7 @@ void setup_lights()
         0.09f,
         0.032f
     );
-
-    spotLight->SetDirectionVec3(mainCamera->GetFront());
-    spotLight->SetPositionVec3(mainCamera->GetPosition());
-    
-    lightList.push_back(spotLight);
+ 
     lightList.push_back(dirLight);
     lightList.push_back(pointLight);
 
