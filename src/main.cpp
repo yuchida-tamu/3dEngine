@@ -31,6 +31,8 @@ double lastY = 0.0;
 float xoffset = 0.0f;
 float yoffset = 0.0f;
 
+Shader *shader1;
+
 // lighting
 glm::vec3 lightPos(-2.0f, 3.0f, 0.5f);
 
@@ -47,7 +49,7 @@ int main()
     mainCamera = new CameraObject();
     // glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
 
-
+    shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");    
     create_objects();
 
     // build and compile our shader program
@@ -58,31 +60,6 @@ int main()
     // uncomment this call to draw in wire frame polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    SpotLight spotLight = SpotLight(
-        mainCamera->GetPosition(),
-        mainCamera->GetFront(),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(1.0, 1.0f, 1.0f),
-        glm::cos(glm::radians(12.5f)),
-        glm::cos(glm::radians(15.5f))
-    );
-
-    DirectionalLight dirLight = DirectionalLight(
-        glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(0.2f, 0.2f, 0.2f),
-        glm::vec3(1.0, 1.0f, 1.0f));
-
-    PointLight pointLight = PointLight(
-        glm::vec3(0.7f, 0.2f, 2.0f),
-        glm::vec3(0.05f, 0.05f, 0.05f),
-        glm::vec3(0.8f, 0.8f, 0.8f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        1.0f,
-        0.09f,
-        0.032f
-    );
 
     // render loop
     while (!mainWindow.GetShouldClose())
@@ -94,16 +71,8 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // setup lighting
-        spotLight.SetDirectionVec3(mainCamera->GetFront());
-        spotLight.SetPositionVec3(mainCamera->GetPosition());
-        spotLight.SetUniform(&shaderList[0]);
-        pointLight.SetUniform(&shaderList[0]);
-        dirLight.SetUniform(&shaderList[0]);
-
         // render Box
-        render_meshes(&shaderList[0]);
-
+        render_meshes(shader1);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         mainWindow.SwapBuffers();
 
@@ -138,7 +107,7 @@ void mouse_callback(GLFWwindow *window, double xposIn, double yposIn)
 
 void create_shaders()
 {
-    Shader *shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");
+    // Shader *shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");
     shaderList.push_back(*shader1);
 }
 
@@ -161,6 +130,42 @@ void render_meshes(Shader *shader)
 
     shader->UseShader();
 
+
+    SpotLight spotLight = SpotLight(
+        mainCamera->GetPosition(),
+        mainCamera->GetFront(),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0, 1.0f, 1.0f),
+        glm::cos(glm::radians(12.5f)),
+        glm::cos(glm::radians(15.5f))
+    );
+
+    DirectionalLight dirLight = DirectionalLight(
+        glm::vec3(-0.2f, -1.0f, -0.3f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(1.0, 1.0f, 1.0f));
+
+    PointLight pointLight = PointLight(
+        glm::vec3(0.7f, 0.2f, 2.0f),
+        glm::vec3(0.05f, 0.05f, 0.05f),
+        glm::vec3(0.8f, 0.8f, 0.8f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        1.0f,
+        0.09f,
+        0.032f
+    );
+
+
+    // setup lighting
+    spotLight.SetDirectionVec3(mainCamera->GetFront());
+    spotLight.SetPositionVec3(mainCamera->GetPosition());
+    spotLight.SetUniform(shader1);
+    pointLight.SetUniform(shader1);
+    dirLight.SetUniform(shader1);
+
+
     shader->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
     shader->SetUniformVec3("viewPos", mainCamera->GetPosition());
 
@@ -180,4 +185,6 @@ void render_meshes(Shader *shader)
     shader->SetUniformMat4("model", model);
     shader->SetUniformMat4("projection", projection);
     meshList[0]->RenderMesh();
+
+    glUseProgram(0);
 }
