@@ -18,6 +18,7 @@
 #include "game_object.h"
 
 #include "renderer.h"
+#include "grid.h"
 
 Window mainWindow;
 CameraObject *mainCamera;
@@ -52,11 +53,11 @@ int main()
     mainWindow = Window();
     mainWindow.Initialize();
     mainCamera = new CameraObject();
+
     glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
 
     shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");    
-    Shader *gridShader = new Shader("src/shaders/grid.vs", "src/shaders/grid.fs");   
-
+    
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
@@ -68,29 +69,8 @@ int main()
     GameObject *boxObject = new GameObject(mainCamera, boxMesh);
 
     // Grid Mesh 
-        uint VAO = 0;
-        uint VBO = 0;
-        float vertices[] = {
-            1.0f,   1.0f,   0.0f,
-            -1.0f,  1.0f,   0.0f,
-            -1.0f,  -1.0f,  0.0f,
-            -1.0f,  -1.0f,  0.0f,
-            1.0f,   -1.0f,  0.0f,
-            1.0f,   1.0f,   0.0f
-        };
-
-        glGenVertexArrays(1, &VAO);
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(VAO);
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+    Grid *grid = new Grid();
+    grid->Initialize();
 
 
 
@@ -145,23 +125,7 @@ int main()
         // render Grid
         if(isGridMode)
         {
-            gridShader->UseShader();
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::mat4(1.0f) = glm::translate(model, glm::vec3{
-                    0.0f, 0.0f, 0.0f
-                });
-                glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-                glm::mat4 view = mainCamera->GetViewMatrix();
-                gridShader->SetUniformMat4("view", view);
-                gridShader->SetUniformMat4("model", model);
-                gridShader->SetUniformMat4("projection", projection);
-                // Draw
-                glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-                glDrawArrays(GL_TRIANGLES, 0, 6);
-
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                glBindVertexArray(0);
-            glUseProgram(0);
+          grid->Render(mainCamera);
         }
         
 
