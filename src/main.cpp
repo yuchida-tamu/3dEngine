@@ -34,6 +34,8 @@ double lastY = 0.0;
 float xoffset = 0.0f;
 float yoffset = 0.0f;
 
+bool isGridMode = true;
+
 Shader *shader1;
 
 // lighting
@@ -117,6 +119,15 @@ int main()
         // input: camera movement
         mainWindow.ProcessInput(mainCamera);
 
+        // toggle grid view mode
+        if (glfwGetKey( mainWindow.GetWindow(), GLFW_KEY_0) == GLFW_PRESS){
+            isGridMode = false;
+        }
+
+        if (glfwGetKey( mainWindow.GetWindow(), GLFW_KEY_9) == GLFW_PRESS){
+            isGridMode = true;
+        }
+
         // render
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -132,23 +143,27 @@ int main()
             lightList.pop_back();
 
         // render Grid
-        gridShader->UseShader();
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::mat4(1.0f) = glm::translate(model, glm::vec3{
-                0.0f, 0.0f, 0.0f
-            });
-            glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-            glm::mat4 view = mainCamera->GetViewMatrix();
-            gridShader->SetUniformMat4("view", view);
-            gridShader->SetUniformMat4("model", model);
-            gridShader->SetUniformMat4("projection", projection);
-            // Draw
-            glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+        if(isGridMode)
+        {
+            gridShader->UseShader();
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::mat4(1.0f) = glm::translate(model, glm::vec3{
+                    0.0f, 0.0f, 0.0f
+                });
+                glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+                glm::mat4 view = mainCamera->GetViewMatrix();
+                gridShader->SetUniformMat4("view", view);
+                gridShader->SetUniformMat4("model", model);
+                gridShader->SetUniformMat4("projection", projection);
+                // Draw
+                glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+                glDrawArrays(GL_TRIANGLES, 0, 6);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
-        glUseProgram(0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+            glUseProgram(0);
+        }
+        
 
         
 
