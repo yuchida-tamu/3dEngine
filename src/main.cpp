@@ -17,6 +17,8 @@
 #include "spot_light.h"
 #include "game_object.h"
 
+#include "renderer.h"
+
 Window mainWindow;
 CameraObject *mainCamera;
 
@@ -80,6 +82,8 @@ int main()
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
+    
+
     // render loop
     while (!mainWindow.GetShouldClose())
     {
@@ -91,19 +95,15 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // render Box
-        shader1->UseShader();
-        shader1->SetUniformVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-        shader1->SetUniformVec3("viewPos", mainCamera->GetPosition());;
-        for(Light* light : lightList)
-        {
-            light->SetUniform(shader1);
-        }
+        // update the position and direction of a spot light before rendering,
+        // and push that into the light list
         spotLight->SetDirectionVec3(mainCamera->GetFront());
         spotLight->SetPositionVec3(mainCamera->GetPosition());
-        spotLight->SetUniform(shader1);
-   
-        boxObject->Render(shader1);
-        glUseProgram(0);
+        lightList.push_back(spotLight);
+
+        Renderer::RenderScene(mainCamera, shader1, std::vector{boxObject}, lightList);
+        // discard the spot light from the list for next update
+        lightList.pop_back();
 
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -157,8 +157,7 @@ void setup_lights()
         0.09f,
         0.032f
     );
- 
+    
     lightList.push_back(dirLight);
     lightList.push_back(pointLight);
-
 }
