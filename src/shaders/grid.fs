@@ -33,6 +33,10 @@ float computeDepth(vec3 pos) {
 }
 
 float computeLinearDepth(vec3 pos) {
+    // near and far correspond to camera view configuration
+    // TODO: use uniform to match with the actually configuration
+    float near = 0.1;
+    float far = 100.f;
     vec4 clip_space_pos = projection * view * vec4(pos.xyz, 1.0);
     float clip_space_depth = (clip_space_pos.z / clip_space_pos.w) * 2.0 - 1.0; // put back between -1 and 1
     float linearDepth = (2.0 * 0.1 * 100.0) / (100.0 + 0.1 - clip_space_depth * (100.0 - 0.1)); // get linear value between 0.01 and 100
