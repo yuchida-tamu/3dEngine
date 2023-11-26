@@ -4,7 +4,5 @@ dependencies
 info.plist
 a.out
 *.**.gch
-
-settings.json
 output
 build/
