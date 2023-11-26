@@ -4,6 +4,8 @@
 #include "camera.h"
 #include "shader.h"
 
+#include "shaders_paths.h"
+
  float vertices[] = {
     1.0f,   1.0f,   0.0f,
     -1.0f,  1.0f,   0.0f,
@@ -25,7 +27,7 @@ class Grid {
         }
 
         void Initialize(){
-            shader = new Shader("src/shaders/grid.vs", "src/shaders/grid.fs");   
+            shader = new Shader(GRID_VERTEX_SHADER_PATH, GRID_FRAGMENT_SHADER_PATH);   
 
             glGenVertexArrays(1, &VAO);
             // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).

@@ -141,7 +141,7 @@ std::string Shader::readFile(std::string filePath)
     }
     else
     {
-        std::cout << "Unable to open file.";
+        std::cout << "Unable to open file." << filePath;
         std::string result("");
         return result;
     }

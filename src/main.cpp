@@ -20,6 +20,8 @@
 #include "renderer.h"
 #include "grid.h"
 
+#include "shaders_paths.h"
+
 Window mainWindow;
 CameraObject *mainCamera;
 
@@ -56,7 +58,7 @@ int main()
 
     glfwSetCursorPosCallback(mainWindow.GetWindow(), mouse_callback);
 
-    shader1 = new Shader("src/shaders/shader.vert", "src/shaders/shader.frag");    
+    shader1 = new Shader(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);    
     
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -65,7 +67,7 @@ int main()
 
     // Prepare a Box object
     Mesh *boxMesh = new Mesh();
-    boxMesh->CreateMesh(basic_cube_vertices, indices, 288, 6, "src/resources/box_diffuse.png", "src/resources/box_specular.png");
+    boxMesh->CreateMesh(basic_cube_vertices, indices, 288, 6,   "/Users/yutauchida/Projects/openGl/3dEngine/src/resources/box_diffuse.png", "/Users/yutauchida/Projects/openGl/3dEngine/src/resources/box_specular.png");
     GameObject *boxObject = new GameObject(mainCamera, boxMesh);
 
     // Grid Mesh 

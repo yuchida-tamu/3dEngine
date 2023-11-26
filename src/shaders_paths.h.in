@@ -1,0 +1,7 @@
+#define VERTEX_SHADER_PATH "${CMAKE_SOURCE_DIR}/src/shaders/shader.vert"
+#define FRAGMENT_SHADER_PATH "${CMAKE_SOURCE_DIR}/src/shaders/shader.frag"
+#define GRID_VERTEX_SHADER_PATH "${CMAKE_SOURCE_DIR}/src/shaders/grid.vs"
+#define GRID_FRAGMENT_SHADER_PATH "${CMAKE_SOURCE_DIR}/src/shaders/grid.fs"
+#define RESOURCE_PATH "${CMAKE_SOURCE_DIR}/src/resources/"
+
+
